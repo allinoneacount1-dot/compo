@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
@@ -14,6 +14,10 @@ import {
   AlertTriangle,
   Clock,
   ChevronRight,
+  ChevronUp,
+  ChevronDown,
+  Download,
+  Filter,
 } from "lucide-react";
 import { DashboardLayout } from "../../components/layout/DashboardLayout";
 import { Card } from "../../components/ui/Card";
@@ -32,6 +36,7 @@ import {
   truncateAddress,
   riskLabel,
   timeAgo,
+  downloadCSV,
 } from "../../lib/utils/format";
 import { cn } from "../../lib/utils/cn";
 
@@ -325,6 +330,14 @@ export default function TokenScanner() {
   const [result, setResult] = useState<ScanResult | null>(null);
   const [history] = useState<HistoryEntry[]>(MOCK_HISTORY);
 
+  // History filter + sort state
+  type RiskFilter = "all" | "safe" | "caution" | "danger";
+  type HistorySortField = "time" | "token" | "score" | "verdict";
+  type SortDir = "asc" | "desc";
+  const [riskFilter, setRiskFilter] = useState<RiskFilter>("all");
+  const [historySortField, setHistorySortField] = useState<HistorySortField>("time");
+  const [historySortDir, setHistorySortDir] = useState<SortDir>("desc");
+
   const handleScan = useCallback(
     (address?: string) => {
       const target = address || scanAddress;
@@ -360,6 +373,59 @@ export default function TokenScanner() {
   const handleCopy = (text: string) => {
     navigator.clipboard?.writeText(text);
   };
+
+  // Filtered + sorted history
+  const filteredHistory = useMemo(() => {
+    const filtered = riskFilter === "all"
+      ? history
+      : history.filter((entry) => {
+          if (riskFilter === "safe") return entry.verdict === "SAFE";
+          if (riskFilter === "caution") return entry.verdict === "CAUTION";
+          if (riskFilter === "danger") return entry.verdict === "DANGER";
+          return true;
+        });
+    return [...filtered].sort((a, b) => {
+      let cmp = 0;
+      switch (historySortField) {
+        case "time":
+          cmp = a.timeDate.getTime() - b.timeDate.getTime();
+          break;
+        case "token":
+          cmp = a.token.localeCompare(b.token);
+          break;
+        case "score":
+          cmp = a.score - b.score;
+          break;
+        case "verdict":
+          cmp = a.verdict.localeCompare(b.verdict);
+          break;
+      }
+      return historySortDir === "asc" ? cmp : -cmp;
+    });
+  }, [history, riskFilter, historySortField, historySortDir]);
+
+  const handleExportHistory = useCallback(() => {
+    downloadCSV(
+      `compo-scanner-history-${new Date().toISOString().slice(0, 10)}.csv`,
+      ["Address", "Token", "Risk Score", "Verdict", "Time"],
+      filteredHistory.map((e) => [
+        e.address,
+        e.token,
+        e.score.toString(),
+        e.verdict,
+        e.time,
+      ])
+    );
+  }, [filteredHistory]);
+
+  const handleHistorySort = useCallback((field: HistorySortField) => {
+    if (historySortField === field) {
+      setHistorySortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setHistorySortField(field);
+      setHistorySortDir("desc");
+    }
+  }, [historySortField]);
 
   return (
     <DashboardLayout>
@@ -727,26 +793,100 @@ export default function TokenScanner() {
                 Recent Scans
               </span>
             </div>
-            <span className="font-mono text-[10px] text-[#525252]">
-              {history.length} entries
-            </span>
+            <div className="flex items-center gap-2">
+              {/* Risk Filter Dropdown */}
+              <div className="flex items-center gap-1.5">
+                <Filter className="w-3 h-3 text-[#525252]" />
+                <select
+                  value={riskFilter}
+                  onChange={(e) => setRiskFilter(e.target.value as RiskFilter)}
+                  className="h-7 px-1.5 rounded bg-[#0a0a0b] border border-[rgba(255,255,255,0.08)] text-[#e4e4e7] font-mono text-[10px] focus:outline-none focus:border-[#3b82f6] appearance-none cursor-pointer"
+                >
+                  <option value="all">All</option>
+                  <option value="safe">Safe</option>
+                  <option value="caution">Caution</option>
+                  <option value="danger">Danger</option>
+                </select>
+              </div>
+              <span className="font-mono text-[10px] text-[#525252]">
+                {filteredHistory.length} entries
+              </span>
+              <button
+                onClick={handleExportHistory}
+                className="flex items-center gap-1 h-7 px-2 rounded bg-[rgba(59,130,246,0.1)] border border-[rgba(59,130,246,0.2)] text-[#3b82f6] hover:bg-[rgba(59,130,246,0.2)] transition-colors"
+              >
+                <Download className="w-3 h-3" />
+                <span className="font-mono text-[10px] uppercase tracking-wider">CSV</span>
+              </button>
+            </div>
           </div>
 
           <Table columns="2fr 1fr 80px 100px 80px">
             <TableHeader>
-              <span>Address</span>
-              <span>Token</span>
-              <span>Risk Score</span>
-              <span>Verdict</span>
-              <span>Time</span>
+              <span
+                className="cursor-pointer hover:text-[#e4e4e7] transition-colors select-none flex items-center gap-1"
+                onClick={() => handleHistorySort("time")}
+              >
+                Time
+                {historySortField === "time" && (
+                  historySortDir === "asc"
+                    ? <ChevronUp className="w-3 h-3 text-[#3b82f6]" />
+                    : <ChevronDown className="w-3 h-3 text-[#3b82f6]" />
+                )}
+              </span>
+              <span
+                className="cursor-pointer hover:text-[#e4e4e7] transition-colors select-none flex items-center gap-1"
+                onClick={() => handleHistorySort("token")}
+              >
+                Token
+                {historySortField === "token" && (
+                  historySortDir === "asc"
+                    ? <ChevronUp className="w-3 h-3 text-[#3b82f6]" />
+                    : <ChevronDown className="w-3 h-3 text-[#3b82f6]" />
+                )}
+              </span>
+              <span
+                className="cursor-pointer hover:text-[#e4e4e7] transition-colors select-none flex items-center gap-1"
+                onClick={() => handleHistorySort("score")}
+              >
+                Score
+                {historySortField === "score" && (
+                  historySortDir === "asc"
+                    ? <ChevronUp className="w-3 h-3 text-[#3b82f6]" />
+                    : <ChevronDown className="w-3 h-3 text-[#3b82f6]" />
+                )}
+              </span>
+              <span
+                className="cursor-pointer hover:text-[#e4e4e7] transition-colors select-none flex items-center gap-1"
+                onClick={() => handleHistorySort("verdict")}
+              >
+                Verdict
+                {historySortField === "verdict" && (
+                  historySortDir === "asc"
+                    ? <ChevronUp className="w-3 h-3 text-[#3b82f6]" />
+                    : <ChevronDown className="w-3 h-3 text-[#3b82f6]" />
+                )}
+              </span>
+              <span className="text-[#525252]">Actions</span>
             </TableHeader>
 
-            {history.map((entry, i) => (
+            {filteredHistory.length === 0 && (
+              <div className="py-8 text-center">
+                <Clock className="w-8 h-8 text-[#525252] mx-auto mb-2" />
+                <p className="font-mono text-xs text-[#525252]">No scans match this filter</p>
+              </div>
+            )}
+
+            {filteredHistory.map((entry, i) => (
               <TableRow
                 key={i}
                 onClick={() => handleHistoryClick(entry)}
               >
-                <TableCell mono>{truncateAddress(entry.address)}</TableCell>
+                <TableCell mono>
+                  <span className="font-mono text-[10px] text-[#525252]">
+                    {entry.time}
+                  </span>
+                </TableCell>
                 <TableCell>
                   <span className="font-mono text-xs text-[#00ff41] font-bold">
                     {entry.token}
@@ -771,9 +911,15 @@ export default function TokenScanner() {
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <span className="font-mono text-[10px] text-[#525252]">
-                    {entry.time}
-                  </span>
+                  <button
+                    className="font-mono text-[10px] text-[#3b82f6] hover:text-[#60a5fa] transition-colors px-2 py-0.5 rounded border border-[rgba(59,130,246,0.15)] hover:border-[rgba(59,130,246,0.3)]"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleHistoryClick(entry);
+                    }}
+                  >
+                    View
+                  </button>
                 </TableCell>
               </TableRow>
             ))}

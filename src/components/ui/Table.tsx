@@ -77,8 +77,8 @@ export function TableRow({ children, onClick, className = "" }: TableRowProps) {
         "border-b border-[rgba(255,255,255,0.04)]",
         "px-4 py-3",
         "text-[#e4e4e7] text-sm",
-        "transition-colors duration-100",
-        onClick ? "cursor-pointer hover:bg-[rgba(255,255,255,0.03)]" : "hover:bg-[rgba(255,255,255,0.02)]",
+        "transition-colors duration-150",
+        onClick ? "cursor-pointer hover:bg-[rgba(0,255,65,0.03)]" : "hover:bg-[rgba(0,255,65,0.03)]",
         className,
       ].join(" ")}
       style={{ gridTemplateColumns: columns.join(" ") }}

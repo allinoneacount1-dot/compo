@@ -25,6 +25,8 @@ import {
   AlertTriangle,
   Settings2,
   History,
+  ChevronUp,
+  ChevronDown,
 } from "lucide-react";
 import { DashboardLayout } from "../../components/layout/DashboardLayout";
 import { Card } from "../../components/ui/Card";
@@ -267,6 +269,12 @@ export default function AlertsPage() {
   const [newAlertChannels, setNewAlertChannels] = useState<string[]>(["telegram"]);
   const [tokenDropdownOpen, setTokenDropdownOpen] = useState(false);
 
+  // Sort state
+  type SortField = "created" | "type" | "status" | "token";
+  type SortDir = "asc" | "desc";
+  const [sortBy, setSortBy] = useState<SortField>("created");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
+
   // Notification settings
   const [notifSettings, setNotifSettings] = useState<NotificationSettings>({
     telegram: true,
@@ -275,11 +283,28 @@ export default function AlertsPage() {
     push: false,
   });
 
-  // Derived data
+  // Derived data — filter + sort
   const filteredAlerts = useMemo(() => {
-    if (filterTab === "all") return alerts;
-    return alerts.filter((a) => a.status === filterTab);
-  }, [alerts, filterTab]);
+    const base = filterTab === "all" ? alerts : alerts.filter((a) => a.status === filterTab);
+    return [...base].sort((a, b) => {
+      let cmp = 0;
+      switch (sortBy) {
+        case "created":
+          cmp = a.createdAt.getTime() - b.createdAt.getTime();
+          break;
+        case "type":
+          cmp = a.type.localeCompare(b.type);
+          break;
+        case "status":
+          cmp = a.status.localeCompare(b.status);
+          break;
+        case "token":
+          cmp = a.symbol.localeCompare(b.symbol);
+          break;
+      }
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+  }, [alerts, filterTab, sortBy, sortDir]);
 
   const activeCount = alerts.filter((a) => a.status === "active").length;
   const triggeredTodayCount = alerts.filter((a) => a.status === "triggered").length;
@@ -676,23 +701,53 @@ export default function AlertsPage() {
             </span>
           </div>
 
-          {/* Filter Tabs */}
-          <div className="flex gap-1 mb-4 p-1 bg-[#0a0a0b] rounded border border-[rgba(255,255,255,0.04)]">
-            {FILTER_TABS.map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setFilterTab(tab.key)}
-                className={cn(
-                  "flex-1 h-8 rounded font-mono text-[11px] uppercase tracking-wider transition-all duration-150",
-                  filterTab === tab.key
-                    ? "bg-[rgba(0,255,65,0.1)] text-[#00ff41] border border-[rgba(0,255,65,0.2)]"
-                    : "text-[#525252] hover:text-[#71717a] border border-transparent"
-                )}
+          {/* Filter Tabs + Sort Dropdown */}
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex gap-1 flex-1 p-1 bg-[#0a0a0b] rounded border border-[rgba(255,255,255,0.04)]">
+              {FILTER_TABS.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setFilterTab(tab.key)}
+                  className={cn(
+                    "flex-1 h-8 rounded font-mono text-[11px] uppercase tracking-wider transition-all duration-150",
+                    filterTab === tab.key
+                      ? "bg-[rgba(0,255,65,0.1)] text-[#00ff41] border border-[rgba(0,255,65,0.2)]"
+                      : "text-[#525252] hover:text-[#71717a] border border-transparent"
+                  )}
+                >
+                  {tab.label}{" "}
+                  <span className="opacity-60">({tabCounts[tab.key]})</span>
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="font-mono text-[10px] text-[#525252] uppercase tracking-wider">Sort</span>
+              <select
+                value={sortBy}
+                onChange={(e) => {
+                  const val = e.target.value as SortField;
+                  setSortBy(val);
+                  setSortDir("desc");
+                }}
+                className="h-8 px-2 rounded bg-[#0a0a0b] border border-[rgba(255,255,255,0.08)] text-[#e4e4e7] font-mono text-[11px] focus:outline-none focus:border-[#00ff41] appearance-none cursor-pointer"
               >
-                {tab.label}{" "}
-                <span className="opacity-60">({tabCounts[tab.key]})</span>
+                <option value="created">Time</option>
+                <option value="type">Type</option>
+                <option value="status">Status</option>
+                <option value="token">Token</option>
+              </select>
+              <button
+                onClick={() => setSortDir((d) => (d === "asc" ? "desc" : "asc"))}
+                className="h-8 w-8 flex items-center justify-center rounded border border-[rgba(255,255,255,0.08)] text-[#525252] hover:text-[#e4e4e7] transition-colors"
+                title={sortDir === "asc" ? "Ascending" : "Descending"}
+              >
+                {sortDir === "asc" ? (
+                  <ChevronUp className="w-3.5 h-3.5" />
+                ) : (
+                  <ChevronDown className="w-3.5 h-3.5" />
+                )}
               </button>
-            ))}
+            </div>
           </div>
 
           {/* Alert Cards */}

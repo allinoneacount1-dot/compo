@@ -12,6 +12,7 @@ import {
   Flame,
   ExternalLink,
   Copy,
+  Check,
   X,
   Bell,
   UserPlus,
@@ -20,6 +21,8 @@ import {
   BarChart3,
   Clock,
   Wallet,
+  Download,
+  Zap,
 } from "lucide-react";
 import { DashboardLayout } from "../../components/layout/DashboardLayout";
 import { Card } from "../../components/ui/Card";
@@ -34,6 +37,9 @@ import {
 import {
   truncateAddress,
   formatNumber,
+  formatSOLAmount,
+  downloadCSV,
+  riskColor,
 } from "../../lib/utils/format";
 import { cn } from "../../lib/utils/cn";
 
@@ -57,6 +63,7 @@ interface WhaleEntry {
   volumeSOL: number;
   trades: number;
   pnlSOL: number;
+  riskScore: number;
 }
 
 interface NotableMovement {
@@ -180,11 +187,11 @@ const MOCK_LIVE_TX: LiveTx[] = [
 ];
 
 const MOCK_WHALES: WhaleEntry[] = [
-  { rank: 1, wallet: "7a3F2e8b9cD1e4A6f0B3c7D2E1a8F5e9C4d6B0a3", volumeSOL: 12450, trades: 342, pnlSOL: 3240 },
-  { rank: 2, wallet: "B5e8C1d3F7a2E0b6D4c9A8f1E3d5C7b0A2e4F6d8", volumeSOL: 9870, trades: 218, pnlSOL: -1250 },
-  { rank: 3, wallet: "E2d4C6b8A0f3E1d5C7b9A2e4F6d0C8a1B3e5D7f9", volumeSOL: 7650, trades: 189, pnlSOL: 2180 },
-  { rank: 4, wallet: "9A1b3C5d7E9f1A2b4C6d8E0f2A4b6C8d0E2a4B6c", volumeSOL: 5420, trades: 156, pnlSOL: -890 },
-  { rank: 5, wallet: "3C5d7E9f1A2b4C6d8E0f2A4b6C8d0E2a4B6c8D0e", volumeSOL: 4230, trades: 97, pnlSOL: 1560 },
+  { rank: 1, wallet: "7a3F2e8b9cD1e4A6f0B3c7D2E1a8F5e9C4d6B0a3", volumeSOL: 12450, trades: 342, pnlSOL: 3240, riskScore: 85 },
+  { rank: 2, wallet: "B5e8C1d3F7a2E0b6D4c9A8f1E3d5C7b0A2e4F6d8", volumeSOL: 9870, trades: 218, pnlSOL: -1250, riskScore: 35 },
+  { rank: 3, wallet: "E2d4C6b8A0f3E1d5C7b9A2e4F6d0C8a1B3e5D7f9", volumeSOL: 7650, trades: 189, pnlSOL: 2180, riskScore: 72 },
+  { rank: 4, wallet: "9A1b3C5d7E9f1A2b4C6d8E0f2A4b6C8d0E2a4B6c", volumeSOL: 5420, trades: 156, pnlSOL: -890, riskScore: 55 },
+  { rank: 5, wallet: "3C5d7E9f1A2b4C6d8E0f2A4b6C8d0E2a4B6c8D0e", volumeSOL: 4230, trades: 97, pnlSOL: 1560, riskScore: 90 },
 ];
 
 const MOCK_NOTABLE: NotableMovement[] = [
@@ -256,8 +263,40 @@ function getActionIcon(action: TxAction) {
   }
 }
 
-function formatSOLAmount(sol: number): string {
-  return `${sol.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} SOL`;
+function formatSOLAmountDisplay(sol: number): string {
+  return formatSOLAmount(sol);
+}
+
+// ─── Copy Button Component ───────────────────────────────────────────────────
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard?.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        handleCopy();
+      }}
+      className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-mono uppercase tracking-wider transition-all duration-200 hover:bg-[rgba(0,255,65,0.1)]"
+      title="Copy address"
+    >
+      {copied ? (
+        <>
+          <Check className="w-3 h-3 text-[#00ff41]" />
+          <span className="text-[#00ff41]">COPIED!</span>
+        </>
+      ) : (
+        <Copy className="w-3 h-3 text-[#525252] hover:text-[#00ff41]" />
+      )}
+    </button>
+  );
 }
 
 // ─── PnL Mini Chart ──────────────────────────────────────────────────────────
@@ -492,7 +531,7 @@ function WalletProfileModal({
                     {trade.token}
                   </span>
                   <span className="font-mono text-[11px] text-[#e4e4e7] text-right">
-                    {formatSOLAmount(trade.amountSOL)}
+                    {formatSOLAmountDisplay(trade.amountSOL)}
                   </span>
                   <span
                     className={cn(
@@ -565,6 +604,21 @@ export default function WhaleRadar() {
     setSelectedWallet(null);
   }, []);
 
+  const handleExportCSV = useCallback(() => {
+    downloadCSV(
+      `compo-whale-movements-${new Date().toISOString().slice(0, 10)}.csv`,
+      ["Time", "Wallet", "Action", "Token", "Amount (SOL)", "Tx Hash"],
+      liveTx.map((tx) => [
+        tx.time,
+        tx.wallet,
+        tx.action,
+        tx.tokenSymbol,
+        tx.amountSOL.toString(),
+        tx.txHash,
+      ])
+    );
+  }, [liveTx]);
+
   const stats = useMemo(
     () => [
       {
@@ -623,16 +677,27 @@ export default function WhaleRadar() {
                     Live Transaction Stream
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="font-mono text-[10px] text-[#00ff41] terminal-blink font-bold">
-                    LIVE
-                  </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleExportCSV}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[rgba(59,130,246,0.12)] border border-[rgba(59,130,246,0.2)] text-[#3b82f6] hover:bg-[rgba(59,130,246,0.2)] transition-colors"
+                  >
+                    <Download className="w-3 h-3" />
+                    <span className="font-mono text-[9px] uppercase tracking-wider">
+                      CSV
+                    </span>
+                  </button>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono text-[10px] text-[#00ff41] terminal-blink font-bold">
+                      LIVE
+                    </span>
+                  </div>
                 </div>
               </div>
 
               <div className="space-y-0 -mx-4">
-                <div className="grid grid-cols-[36px_70px_1fr_80px_70px_90px_80px] gap-1 px-4 py-1.5 border-b border-[rgba(255,255,255,0.06)]">
-                  {["", "Time", "Wallet", "Action", "Token", "Amount", "Tx"].map(
+                <div className="grid grid-cols-[36px_70px_1fr_80px_70px_90px_80px_40px] gap-1 px-4 py-1.5 border-b border-[rgba(255,255,255,0.06)]">
+                  {["", "Time", "Wallet", "Action", "Token", "Amount", "Tx", ""].map(
                     (h) => (
                       <span
                         key={h}
@@ -655,7 +720,7 @@ export default function WhaleRadar() {
                           duration: 0.3,
                           delay: index * 0.05,
                         }}
-                        className="grid grid-cols-[36px_70px_1fr_80px_70px_90px_80px] gap-1 px-4 py-2 border-b border-[rgba(255,255,255,0.03)] hover:bg-[rgba(255,255,255,0.02)] transition-colors duration-100 items-center"
+                        className="grid grid-cols-[36px_70px_1fr_80px_70px_90px_80px_40px] gap-1 px-4 py-2 border-b border-[rgba(255,255,255,0.03)] hover:bg-[rgba(0,255,65,0.03)] transition-colors duration-150 items-center"
                       >
                         {/* Live dot */}
                         <div className="flex justify-center">
@@ -672,12 +737,15 @@ export default function WhaleRadar() {
                         </span>
 
                         {/* Wallet */}
-                        <button
-                          onClick={() => handleWalletClick(tx.wallet)}
-                          className="font-mono text-[11px] text-[#3b82f6] hover:text-[#60a5fa] transition-colors truncate text-left"
-                        >
-                          {truncateAddress(tx.wallet, 6, 4)}
-                        </button>
+                        <div className="flex items-center gap-1 min-w-0">
+                          <button
+                            onClick={() => handleWalletClick(tx.wallet)}
+                            className="font-mono text-[11px] text-[#3b82f6] hover:text-[#60a5fa] transition-colors truncate text-left"
+                          >
+                            {truncateAddress(tx.wallet, 6, 4)}
+                          </button>
+                          <CopyButton text={tx.wallet} />
+                        </div>
 
                         {/* Action */}
                         <span className="flex items-center gap-1">
@@ -696,7 +764,7 @@ export default function WhaleRadar() {
 
                         {/* Amount */}
                         <span className="font-mono text-[11px] text-[#e4e4e7] text-right">
-                          {tx.amountSOL.toFixed(1)}
+                          {formatSOLAmountDisplay(tx.amountSOL)}
                         </span>
 
                         {/* Tx Hash */}
@@ -709,6 +777,14 @@ export default function WhaleRadar() {
                           {tx.txHash}
                           <ExternalLink className="w-2.5 h-2.5 flex-shrink-0" />
                         </a>
+
+                        {/* Quick Snipe */}
+                        <button
+                          className="flex items-center justify-center w-6 h-6 rounded hover:bg-[rgba(245,158,11,0.15)] transition-colors duration-150"
+                          title="Quick Snipe"
+                        >
+                          <Zap className="w-3 h-3 text-[#f59e0b]" />
+                        </button>
                       </motion.div>
                     ))}
                   </AnimatePresence>
@@ -728,13 +804,15 @@ export default function WhaleRadar() {
                 </span>
               </div>
 
-              <Table columns="36px 1fr 90px 50px 80px" dense>
+              <Table columns="36px 1fr 90px 50px 80px 60px 40px" dense>
                 <TableHeader>
                   <span>#</span>
                   <span>Wallet</span>
                   <span className="text-right">Volume</span>
                   <span className="text-right">Trades</span>
                   <span className="text-right">P&L</span>
+                  <span className="text-right">Risk</span>
+                  <span></span>
                 </TableHeader>
                 {MOCK_WHALES.map((whale) => (
                   <TableRow
@@ -744,9 +822,12 @@ export default function WhaleRadar() {
                     <span className="font-mono text-[11px] text-[#525252]">
                       {whale.rank}
                     </span>
-                    <span className="font-mono text-[11px] text-[#3b82f6] hover:text-[#60a5fa] transition-colors">
-                      {truncateAddress(whale.wallet, 5, 4)}
-                    </span>
+                    <div className="flex items-center gap-1 min-w-0">
+                      <span className="font-mono text-[11px] text-[#3b82f6] hover:text-[#60a5fa] transition-colors truncate">
+                        {truncateAddress(whale.wallet, 5, 4)}
+                      </span>
+                      <CopyButton text={whale.wallet} />
+                    </div>
                     <span className="font-mono text-[11px] text-[#e4e4e7] text-right">
                       {formatNumber(whale.volumeSOL)} SOL
                     </span>
@@ -762,6 +843,21 @@ export default function WhaleRadar() {
                       {whale.pnlSOL >= 0 ? "+" : ""}
                       {formatNumber(whale.pnlSOL)} SOL
                     </span>
+                    <span
+                      className={cn(
+                        "font-mono text-[11px] text-right font-medium",
+                        riskColor(whale.riskScore)
+                      )}
+                    >
+                      {whale.riskScore}
+                    </span>
+                    <button
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center justify-center w-6 h-6 rounded hover:bg-[rgba(245,158,11,0.15)] transition-colors duration-150"
+                      title="Quick Snipe"
+                    >
+                      <Zap className="w-3 h-3 text-[#f59e0b]" />
+                    </button>
                   </TableRow>
                 ))}
               </Table>

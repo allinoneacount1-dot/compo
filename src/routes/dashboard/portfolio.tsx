@@ -20,6 +20,7 @@ import {
 import { DashboardLayout } from "../../components/layout/DashboardLayout";
 import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
+import { formatPriceDetailed, formatPercent, downloadCSV } from "../../lib/utils/format";
 
 // ─── Types ───
 
@@ -434,6 +435,7 @@ export default function PortfolioPage() {
 
   // Derived data
   const totalValue = HOLDINGS.reduce((s, h) => s + h.holdingsValue, 0);
+  const totalSOL = totalValue / 178;
   const totalPnl = HOLDINGS.reduce((s, h) => s + h.pnl, 0);
   const totalPnlPercent = (totalPnl / (totalValue - totalPnl)) * 100;
   const bestPerformer = HOLDINGS.reduce((best, h) =>
@@ -491,32 +493,23 @@ export default function PortfolioPage() {
   );
 
   const handleExport = useCallback(() => {
-    const data = {
-      exportedAt: new Date().toISOString(),
-      totalValue,
-      totalPnl,
-      totalPnlPercent,
-      holdings: HOLDINGS.map((h) => ({
-        symbol: h.symbol,
-        name: h.name,
-        price: h.price,
-        change24h: h.change24h,
-        holdingsValue: h.holdingsValue,
-        pnl: h.pnl,
-        allocation: h.allocation,
-        amount: h.amount,
-      })),
-    };
-    const blob = new Blob([JSON.stringify(data, null, 2)], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `compo-portfolio-${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }, [totalValue, totalPnl, totalPnlPercent]);
+    downloadCSV(
+      `compo-portfolio-${new Date().toISOString().slice(0, 10)}.csv`,
+      ["Symbol", "Name", "Price", "Change 24h", "Holdings Value", "P&L", "P&L %", "Allocation", "Amount", "Category"],
+      HOLDINGS.map((h) => [
+        h.symbol,
+        h.name,
+        h.price.toString(),
+        h.change24h.toString(),
+        h.holdingsValue.toString(),
+        h.pnl.toString(),
+        h.pnlPercent.toString(),
+        h.allocation.toString(),
+        h.amount.toString(),
+        h.category,
+      ])
+    );
+  }, []);
 
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field)
@@ -526,13 +519,6 @@ export default function PortfolioPage() {
     ) : (
       <ChevronDown className="w-3 h-3 text-[#00ff41]" />
     );
-  };
-
-  const formatPrice = (price: number) => {
-    if (price >= 1000) return `$${price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    if (price >= 1) return `$${price.toFixed(2)}`;
-    if (price >= 0.0001) return `$${price.toFixed(6)}`;
-    return `$${price.toFixed(8)}`;
   };
 
   const formatAmount = (amount: number, symbol: string) => {
@@ -693,6 +679,17 @@ export default function PortfolioPage() {
                 "$0"
               )}
             </p>
+            <p className="font-mono text-[10px] text-[#71717a] mt-1">
+              {mounted ? (
+                <AnimatedCounter
+                  value={totalSOL}
+                  suffix=" SOL"
+                  decimals={4}
+                />
+              ) : (
+                "0.0000 SOL"
+              )}
+            </p>
             <p className="text-xs font-mono mt-1 text-[#00ff41]">
               ● LIVE
             </p>
@@ -734,8 +731,7 @@ export default function PortfolioPage() {
                 totalPnl >= 0 ? "text-[#00ff41]" : "text-[#ef4444]",
               ].join(" ")}
             >
-              {totalPnl >= 0 ? "+" : ""}
-              {totalPnlPercent.toFixed(2)}% today
+              {formatPercent(totalPnlPercent)} today
             </p>
           </Card>
 
@@ -754,10 +750,10 @@ export default function PortfolioPage() {
             </p>
             <div className="flex items-center gap-2 mt-1">
               <Badge variant="success" size="sm">
-                +{bestPerformer.change24h.toFixed(2)}%
+                {formatPercent(bestPerformer.change24h)}
               </Badge>
               <span className="font-mono text-[10px] text-[#525252]">
-                {formatPrice(bestPerformer.price)}
+                {formatPriceDetailed(bestPerformer.price)}
               </span>
             </div>
           </Card>
@@ -777,10 +773,10 @@ export default function PortfolioPage() {
             </p>
             <div className="flex items-center gap-2 mt-1">
               <Badge variant="danger" size="sm">
-                {worstPerformer.change24h.toFixed(2)}%
+                {formatPercent(worstPerformer.change24h)}
               </Badge>
               <span className="font-mono text-[10px] text-[#525252]">
-                {formatPrice(worstPerformer.price)}
+                {formatPriceDetailed(worstPerformer.price)}
               </span>
             </div>
           </Card>
@@ -908,7 +904,7 @@ export default function PortfolioPage() {
                 {sortedHoldings.map((h) => (
                   <tr
                     key={h.symbol}
-                    className="border-b border-[rgba(255,255,255,0.03)] hover:bg-[rgba(255,255,255,0.02)] transition-colors"
+                    className="border-b border-[rgba(255,255,255,0.03)] hover:bg-[rgba(0,255,65,0.03)] transition-colors duration-150"
                   >
                     {/* Token */}
                     <td className="px-3 py-2.5">
@@ -946,7 +942,7 @@ export default function PortfolioPage() {
                     {/* Price */}
                     <td className="px-3 py-2.5">
                       <span className="font-mono text-xs text-[#e4e4e7]">
-                        {formatPrice(h.price)}
+                        {formatPriceDetailed(h.price)}
                       </span>
                     </td>
 
@@ -966,8 +962,7 @@ export default function PortfolioPage() {
                               : "text-[#ef4444]",
                           ].join(" ")}
                         >
-                          {h.change24h >= 0 ? "+" : ""}
-                          {h.change24h.toFixed(2)}%
+                          {formatPercent(h.change24h)}
                         </span>
                       </div>
                     </td>
@@ -988,7 +983,7 @@ export default function PortfolioPage() {
                             h.pnl >= 0 ? "text-[#00ff41]" : "text-[#ef4444]",
                           ].join(" ")}
                         >
-                          {h.pnl >= 0 ? "+" : ""}$
+                          {h.pnl >= 0 ? "+" : "-"}$
                           {Math.abs(h.pnl).toLocaleString("en-US")}
                         </span>
                         <span
@@ -999,8 +994,7 @@ export default function PortfolioPage() {
                               : "text-[#ef4444]/70",
                           ].join(" ")}
                         >
-                          ({h.pnlPercent >= 0 ? "+" : ""}
-                          {h.pnlPercent.toFixed(2)}%)
+                          ({formatPercent(h.pnlPercent)})
                         </span>
                       </div>
                     </td>
@@ -1052,7 +1046,7 @@ export default function PortfolioPage() {
                     totalPnl >= 0 ? "text-[#00ff41]" : "text-[#ef4444]"
                   }
                 >
-                  {totalPnl >= 0 ? "+" : ""}$
+                  {totalPnl >= 0 ? "+" : "-"}$
                   {Math.abs(totalPnl).toLocaleString("en-US")}
                 </span>
               </span>
@@ -1093,7 +1087,7 @@ export default function PortfolioPage() {
               return (
                 <div
                   key={tx.id}
-                  className="grid grid-cols-[80px_1fr_100px_100px_80px] gap-2 px-3 py-2.5 border-b border-[rgba(255,255,255,0.03)] hover:bg-[rgba(255,255,255,0.02)] transition-colors"
+                  className="grid grid-cols-[80px_1fr_100px_100px_80px] gap-2 px-3 py-2.5 border-b border-[rgba(255,255,255,0.03)] hover:bg-[rgba(0,255,65,0.03)] transition-colors duration-150"
                 >
                   <div className="flex items-center gap-1.5">
                     <div

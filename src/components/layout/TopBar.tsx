@@ -1,15 +1,18 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Search, Bell, Wallet, ChevronDown } from "lucide-react";
+import { Search, Bell, Wallet, ChevronDown, Menu } from "lucide-react";
 import { truncateAddress } from "../../lib/utils/format";
 
 interface TopBarProps {
   title?: string;
   actions?: ReactNode;
+  isMobileOpen?: boolean;
+  onMobileClose?: () => void;
+  onMobileMenuToggle?: () => void;
 }
 
-export function TopBar({ title = "Overview", actions }: TopBarProps) {
+export function TopBar({ title = "Overview", actions, onMobileMenuToggle }: TopBarProps) {
   // Mock wallet state — would come from zustand store in real app
   const walletConnected = false;
   const walletAddress = "0x7a3F8e2B9c4D1e5F6a7B3C8d9E0f2A1b4c5D3f2e";
@@ -22,8 +25,16 @@ export function TopBar({ title = "Overview", actions }: TopBarProps) {
         borderBottom: "1px solid rgba(255,255,255,0.06)",
       }}
     >
-      {/* Left: Page title */}
+      {/* Left: Hamburger (mobile) + Page title */}
       <div className="flex items-center gap-3">
+        {/* Hamburger menu — mobile only */}
+        <button
+          onClick={onMobileMenuToggle}
+          className="md:hidden w-9 h-9 flex items-center justify-center rounded hover:bg-[rgba(255,255,255,0.06)] transition-colors cursor-pointer"
+          aria-label="Toggle menu"
+        >
+          <Menu className="w-5 h-5 text-[#71717a]" />
+        </button>
         <h1 className="font-mono text-[15px] font-bold text-[#00ff41] tracking-wide">
           {title}
         </h1>

@@ -47,6 +47,7 @@ function getPageTitle(page: Page): string {
 
 function App() {
   const [page, setPage] = useState<Page>(getInitialPage);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleHash = useCallback(() => {
     setPage(getInitialPage());
@@ -56,6 +57,31 @@ function App() {
     window.addEventListener("hashchange", handleHash);
     return () => window.removeEventListener("hashchange", handleHash);
   }, [handleHash]);
+
+  // Close mobile menu on hash change (navigation)
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [page]);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
+
+  const handleMobileMenuToggle = useCallback(() => {
+    setIsMobileMenuOpen((prev) => !prev);
+  }, []);
+
+  const handleMobileMenuClose = useCallback(() => {
+    setIsMobileMenuOpen(false);
+  }, []);
 
   if (page === "booting") {
     return <BootingPage />;
@@ -96,7 +122,16 @@ function App() {
       content = <DashboardOverview />;
   }
 
-  return <DashboardLayout title={getPageTitle(page)}>{content}</DashboardLayout>;
+  return (
+    <DashboardLayout
+      title={getPageTitle(page)}
+      isMobileOpen={isMobileMenuOpen}
+      onMobileClose={handleMobileMenuClose}
+      onMobileMenuToggle={handleMobileMenuToggle}
+    >
+      {content}
+    </DashboardLayout>
+  );
 }
 
 export default App;

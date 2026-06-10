@@ -39,17 +39,60 @@ export function timeAgo(date: Date | string): string {
   return `${Math.floor(seconds / 86400)}d ago`;
 }
 
-// Risk score color
+// Risk score color (Green 71-100, Yellow 41-70, Red 0-40)
 export function riskColor(score: number): string {
-  if (score >= 70) return "text-[#10b981]";
-  if (score >= 40) return "text-[#f59e0b]";
+  if (score >= 71) return "text-[#10b981]";
+  if (score >= 41) return "text-[#f59e0b]";
   return "text-[#ef4444]";
 }
 
 // Risk score label
 export function riskLabel(score: number): string {
-  if (score >= 70) return "SAFE";
-  if (score >= 40) return "CAUTION";
-  if (score >= 20) return "DANGER";
-  return "UNKNOWN";
+  if (score >= 71) return "SAFE";
+  if (score >= 41) return "CAUTION";
+  return "DANGER";
+}
+
+// Risk score hex color for backgrounds/borders
+export function riskHex(score: number): string {
+  if (score >= 71) return "#10b981";
+  if (score >= 41) return "#f59e0b";
+  return "#ef4444";
+}
+
+// Price formatting:
+// < $1: 6 decimals, $1-$100: 4 decimals, > $100: 2 decimals with commas
+export function formatPriceDetailed(price: number): string {
+  if (price >= 100) {
+    return `$${price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+  if (price >= 1) {
+    return `$${price.toFixed(4)}`;
+  }
+  return `$${price.toFixed(6)}`;
+}
+
+// SOL amount formatting: always 4 decimals
+export function formatSOLAmount(sol: number): string {
+  return `${sol.toFixed(4)} SOL`;
+}
+
+// Percentage formatting: 2 decimals with sign
+export function formatPercent(pct: number): string {
+  return `${pct >= 0 ? "+" : ""}${pct.toFixed(2)}%`;
+}
+
+// CSV export helper
+export function downloadCSV(filename: string, headers: string[], rows: string[][]): void {
+  const csvContent = [
+    headers.join(","),
+    ...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
+  ].join("\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
 }
