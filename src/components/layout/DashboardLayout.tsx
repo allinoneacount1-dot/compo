@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
@@ -16,6 +16,18 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children, title = "Overview", isMobileOpen = false, onMobileClose, onMobileMenuToggle }: DashboardLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // Close mobile menu on resize to desktop
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const handler = (e: MediaQueryListEvent | MediaQueryList) => {
+      if (e.matches && isMobileOpen) {
+        onMobileClose?.();
+      }
+    };
+    mq.addEventListener("change", handler as any);
+    return () => mq.removeEventListener("change", handler as any);
+  }, [isMobileOpen, onMobileClose]);
 
   return (
     <div className="h-[100dvh] overflow-hidden">
@@ -43,7 +55,7 @@ export function DashboardLayout({ children, title = "Overview", isMobileOpen = f
       <StatusBar />
       <main
         className={[
-          "h-[100dvh] overflow-y-auto transition-[margin-left] duration-200 ease-out",
+          "h-[100dvh] overflow-y-auto overflow-x-hidden transition-[margin-left] duration-200 ease-out",
           "ml-0",
           sidebarCollapsed ? "md:ml-[64px]" : "md:ml-[240px]",
         ].join(" ")}

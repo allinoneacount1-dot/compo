@@ -31,7 +31,6 @@ import {
   Brain,
   Wand2,
 } from "lucide-react";
-import { DashboardLayout } from "../../components/layout/DashboardLayout";
 import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
@@ -418,7 +417,6 @@ export default function AlertsPage() {
   ];
 
   return (
-    <DashboardLayout>
       <div className="p-3 space-y-3 max-w-[1280px]">
         {/* ═══════════════════════════════════════════════════════════════
             PAGE HEADER
@@ -1194,6 +1192,5 @@ export default function AlertsPage() {
           </Card>
         </div>
       </div>
-    </DashboardLayout>
   );
 }

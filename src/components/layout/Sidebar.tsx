@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useState, useEffect, useCallback } from "react";
+import { type ReactNode, useState, useEffect, useCallback, useRef } from "react";
 import { X } from "lucide-react";
 import {
   LayoutDashboard,
@@ -50,7 +50,6 @@ export function Sidebar({ collapsed = false, onToggle, isMobileOpen = false, onM
     window.location.hash = route;
     const idx = navItems.findIndex((item) => item.route === route);
     if (idx >= 0) setActiveIndex(idx);
-    // Close mobile drawer on navigation
     onMobileClose?.();
   }, [onMobileClose]);
 
@@ -64,6 +63,26 @@ export function Sidebar({ collapsed = false, onToggle, isMobileOpen = false, onM
     return () => window.removeEventListener("hashchange", onHashChange);
   }, []);
 
+  // Swipe-to-close: track touch start/end on the drawer
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    const diff = touchStartX.current - touchEndX.current;
+    // Swipe left more than 80px → close
+    if (diff > 80) {
+      onMobileClose?.();
+    }
+  }, [onMobileClose]);
+
   return (
     <>
       {/* Mobile: off-canvas drawer */}
@@ -71,11 +90,14 @@ export function Sidebar({ collapsed = false, onToggle, isMobileOpen = false, onM
         className={[
           "md:hidden fixed inset-y-0 left-0 z-50 flex flex-col",
           "bg-[#0a0a0b] border-r border-[rgba(255,255,255,0.06)]",
-          "w-[260px]",
-          "transition-transform duration-200 ease-out",
+          "w-[280px]",
+          "transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
           isMobileOpen ? "translate-x-0" : "-translate-x-full",
         ].join(" ")}
         style={{ paddingTop: 56, paddingBottom: 28 }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         {/* Mobile header with close button */}
         <div className="flex items-center justify-between h-14 px-4 border-b border-[rgba(255,255,255,0.06)]">
@@ -90,19 +112,20 @@ export function Sidebar({ collapsed = false, onToggle, isMobileOpen = false, onM
           <button
             onClick={onMobileClose}
             className="w-8 h-8 flex items-center justify-center rounded hover:bg-[rgba(255,255,255,0.06)] transition-colors cursor-pointer"
+            aria-label="Close menu"
           >
             <X className="w-4 h-4 text-[#71717a]" />
           </button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 py-2 overflow-y-auto">
+        <nav className="flex-1 py-2 overflow-y-auto overscroll-contain">
           {navItems.map((item, i) => (
             <button
               key={item.label}
               onClick={() => navigateTo(item.route)}
               className={[
-                "w-full flex items-center h-10 px-4 relative cursor-pointer",
+                "w-full flex items-center h-11 px-4 relative cursor-pointer",
                 "font-mono text-[13px] transition-colors duration-100",
                 "gap-3",
                 activeIndex === i
@@ -125,6 +148,13 @@ export function Sidebar({ collapsed = false, onToggle, isMobileOpen = false, onM
             </button>
           ))}
         </nav>
+
+        {/* Mobile: swipe hint */}
+        <div className="px-4 py-2 border-t border-[rgba(255,255,255,0.04)]">
+          <p className="font-mono text-[9px] text-[#3a3a3a] text-center">
+            ← swipe to close
+          </p>
+        </div>
       </aside>
 
       {/* Desktop: static sidebar */}

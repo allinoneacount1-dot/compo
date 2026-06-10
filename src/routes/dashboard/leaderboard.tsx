@@ -16,7 +16,6 @@ import {
   ChevronUp,
   ChevronDown,
 } from "lucide-react";
-import { DashboardLayout } from "../../components/layout/DashboardLayout";
 import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
 import { cn } from "../../lib/utils/cn";
@@ -965,7 +964,6 @@ export default function LeaderboardPage() {
   };
 
   return (
-    <DashboardLayout>
       <div className="p-3 space-y-3">
         {/* ── Header ── */}
         <div className="flex items-center justify-between">
@@ -1225,7 +1223,6 @@ export default function LeaderboardPage() {
           </div>
         </Card>
       </div>
-    </DashboardLayout>
   );
 }
 

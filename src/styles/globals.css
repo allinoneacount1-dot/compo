@@ -46,3 +46,29 @@ body {
   background: rgba(0,255,159,0.2);
   color: white;
 }
+
+/* ── Mobile overflow protection ── */
+@media (max-width: 767px) {
+  /* Prevent horizontal overflow on mobile */
+  body {
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Tables: horizontal scroll on mobile */
+  table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Grid containers: prevent overflow */
+  .grid {
+    max-width: 100vw;
+  }
+
+  /* Long text truncation */
+  .truncate {
+    max-width: 120px;
+  }
+}

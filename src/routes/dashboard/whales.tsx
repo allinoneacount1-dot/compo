@@ -28,7 +28,6 @@ import {
   Star,
   SlidersHorizontal,
 } from "lucide-react";
-import { DashboardLayout } from "../../components/layout/DashboardLayout";
 import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
@@ -657,8 +656,8 @@ export default function WhaleRadar() {
   );
 
   return (
-    <DashboardLayout>
-      <div className="p-3 space-y-3 max-w-[1400px]">
+    <>
+    <div className="p-3 space-y-3 max-w-[1400px]">
         {/* ── 1. Stats Bar ── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {stats.map((stat) => (
@@ -1040,6 +1039,6 @@ export default function WhaleRadar() {
           />
         )}
       </AnimatePresence>
-    </DashboardLayout>
+    </>
   );
 }

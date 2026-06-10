@@ -17,7 +17,6 @@ import {
   PieChart,
   RefreshCw,
 } from "lucide-react";
-import { DashboardLayout } from "../../components/layout/DashboardLayout";
 import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
 import { formatPriceDetailed, formatPercent, downloadCSV } from "../../lib/utils/format";
@@ -558,7 +557,6 @@ export default function PortfolioPage() {
   ];
 
   return (
-    <DashboardLayout>
       <div className="p-4 space-y-4 max-w-[1400px]">
         {/* ── Header ── */}
         <div className="flex items-center justify-between">
@@ -1145,6 +1143,5 @@ export default function PortfolioPage() {
           </span>
         </div>
       </div>
-    </DashboardLayout>
   );
 }

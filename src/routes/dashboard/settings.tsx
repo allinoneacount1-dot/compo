@@ -28,7 +28,6 @@ import {
   FileText,
   HardDrive,
 } from "lucide-react";
-import { DashboardLayout } from "../../components/layout/DashboardLayout";
 import { Card } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
@@ -1620,8 +1619,8 @@ export default function SettingsPage() {
   };
 
   return (
-    <DashboardLayout>
-      <div className="p-4 max-w-[1280px]">
+    <>
+    <div className="p-4 max-w-[1280px]">
         {/* ── Page Header ── */}
         <div className="flex items-center gap-3 mb-6">
           <div className="w-9 h-9 rounded bg-[rgba(0,255,65,0.1)] flex items-center justify-center">
@@ -1690,6 +1689,6 @@ export default function SettingsPage() {
         onAdd={handleAddWallet}
         onCancel={() => setAddWalletModalOpen(false)}
       />
-    </DashboardLayout>
+    </>
   );
 }

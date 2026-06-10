@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Search, Bell, Wallet, ChevronDown, Menu } from "lucide-react";
+import { Search, Bell, Wallet, ChevronDown, Menu, X } from "lucide-react";
 import { truncateAddress } from "../../lib/utils/format";
 
 interface TopBarProps {
@@ -12,36 +12,51 @@ interface TopBarProps {
   onMobileMenuToggle?: () => void;
 }
 
-export function TopBar({ title = "Overview", actions, onMobileMenuToggle }: TopBarProps) {
+export function TopBar({ title = "Overview", actions, isMobileOpen = false, onMobileMenuToggle }: TopBarProps) {
   // Mock wallet state — would come from zustand store in real app
   const walletConnected = false;
   const walletAddress = "0x7a3F8e2B9c4D1e5F6a7B3C8d9E0f2A1b4c5D3f2e";
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-30 h-[56px] flex items-center justify-between px-4"
+      className="fixed top-0 left-0 right-0 z-30 h-[56px] flex items-center justify-between px-3 md:px-4"
       style={{
         background: "#0a0a0b",
         borderBottom: "1px solid rgba(255,255,255,0.06)",
       }}
     >
       {/* Left: Hamburger (mobile) + Page title */}
-      <div className="flex items-center gap-3">
-        {/* Hamburger menu — mobile only */}
+      <div className="flex items-center gap-2 md:gap-3 min-w-0">
+        {/* Hamburger menu — mobile only, animated */}
         <button
           onClick={onMobileMenuToggle}
-          className="md:hidden w-9 h-9 flex items-center justify-center rounded hover:bg-[rgba(255,255,255,0.06)] transition-colors cursor-pointer"
+          className="md:hidden w-9 h-9 flex items-center justify-center rounded hover:bg-[rgba(255,255,255,0.06)] transition-colors cursor-pointer relative"
           aria-label="Toggle menu"
         >
-          <Menu className="w-5 h-5 text-[#71717a]" />
+          <div className="relative w-5 h-5 flex items-center justify-center">
+            {/* Menu icon */}
+            <Menu
+              className={[
+                "w-5 h-5 text-[#71717a] absolute transition-all duration-200",
+                isMobileOpen ? "opacity-0 rotate-90 scale-50" : "opacity-100 rotate-0 scale-100",
+              ].join(" ")}
+            />
+            {/* X icon */}
+            <X
+              className={[
+                "w-5 h-5 text-[#71717a] absolute transition-all duration-200",
+                isMobileOpen ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-50",
+              ].join(" ")}
+            />
+          </div>
         </button>
-        <h1 className="font-mono text-[15px] font-bold text-[#00ff41] tracking-wide">
+        <h1 className="font-mono text-[14px] md:text-[15px] font-bold text-[#00ff41] tracking-wide truncate">
           {title}
         </h1>
       </div>
 
       {/* Right: Search + Chain + Notifications + Wallet */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 md:gap-3">
         {/* Global search */}
         <div className="hidden md:flex items-center relative">
           <Search className="absolute left-3 w-4 h-4 text-[#525252] pointer-events-none" />
@@ -79,7 +94,7 @@ export function TopBar({ title = "Overview", actions, onMobileMenuToggle }: TopB
 
         {/* Wallet button */}
         {walletConnected ? (
-          <button className="flex items-center gap-2 h-9 px-3 rounded bg-[rgba(59,130,246,0.1)] border border-[rgba(59,130,246,0.2)] hover:border-[rgba(59,130,246,0.4)] transition-colors">
+          <button className="hidden sm:flex items-center gap-2 h-9 px-3 rounded bg-[rgba(59,130,246,0.1)] border border-[rgba(59,130,246,0.2)] hover:border-[rgba(59,130,246,0.4)] transition-colors">
             <Wallet className="w-4 h-4 text-[#3b82f6]" />
             <span className="font-mono text-xs text-[#3b82f6]">
               {truncateAddress(walletAddress, 4, 4)}
@@ -89,7 +104,7 @@ export function TopBar({ title = "Overview", actions, onMobileMenuToggle }: TopB
         ) : (
           <button className="flex items-center gap-2 h-9 px-3 rounded bg-[#3b82f6] hover:bg-[#2563eb] transition-colors">
             <Wallet className="w-4 h-4 text-white" />
-            <span className="text-xs text-white font-medium">Connect Wallet</span>
+            <span className="hidden sm:inline text-xs text-white font-medium">Connect</span>
           </button>
         )}
 

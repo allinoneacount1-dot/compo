@@ -22,7 +22,6 @@ import {
   Flame,
   Activity,
 } from "lucide-react";
-import { DashboardLayout } from "../../components/layout/DashboardLayout";
 import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
@@ -382,7 +381,6 @@ export default function SniperCenter() {
   }, [historyFilter]);
 
   return (
-    <DashboardLayout>
       <div className="p-4 space-y-5 max-w-[1280px]">
         {/* ═══════════════════════════════════════════════════════════════
             1. QUICK SNIPE
@@ -1232,6 +1230,5 @@ export default function SniperCenter() {
           </AnimatePresence>
         </div>
       </div>
-    </DashboardLayout>
   );
 }

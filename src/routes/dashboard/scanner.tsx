@@ -20,7 +20,6 @@ import {
   Download,
   Filter,
 } from "lucide-react";
-import { DashboardLayout } from "../../components/layout/DashboardLayout";
 import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
@@ -429,7 +428,6 @@ export default function TokenScanner() {
   }, [historySortField]);
 
   return (
-    <DashboardLayout>
       <div className="p-3 space-y-3 max-w-[1200px]">
         {/* ── 1. Scan Input ── */}
         <Card>
@@ -981,6 +979,5 @@ export default function TokenScanner() {
           </Table>
         </Card>
       </div>
-    </DashboardLayout>
   );
 }
