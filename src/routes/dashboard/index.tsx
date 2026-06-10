@@ -3,17 +3,14 @@
 import { useState, useMemo, useCallback } from "react";
 import {
   TrendingUp, TrendingDown, Eye, ArrowUpRight, ArrowDownRight,
-  Clock, ShieldAlert, ShieldX, Activity, Zap,
+  Clock, ShieldX, Activity, Zap,
 } from "lucide-react";
-import { Card } from "../../components/ui/Card";
-import { Badge } from "../../components/ui/Badge";
 import { CountUp } from "../../components/ui/CountUp";
 import { formatNumber } from "../../lib/utils/format";
 import { MiniSparkline, QuickSellButtons } from "../../components/ui/MiniSparkline";
 import { useKnownTokenPrices, useNetworkHealth } from "../../lib/hooks/useDexScreener";
 import type { TokenPrice } from "../../lib/hooks/useDexScreener";
 
-// --- Fallback mock data ---
 const FALLBACK_WATCHLIST = [
   { symbol: "SOL", name: "Solana", address: "So11111111111111111111111111111111111111112", priceUsd: 178, priceChangeH24: 2.1, volumeH24: 8500000, liquidityUsd: 95000000, txnsH24: { buys: 12400, sells: 9800 } },
   { symbol: "BONK", name: "BONK", address: "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263", priceUsd: 0.00001245, priceChangeH24: 12.4, volumeH24: 4200000, liquidityUsd: 3800000, txnsH24: { buys: 8900, sells: 5200 } },
@@ -41,7 +38,6 @@ const FALLBACK_WHALES = [
 
 const TREND_7D = [11200, 11800, 11400, 12100, 11900, 12400, 12847];
 
-// --- Helpers ---
 function getScoreColor(score: number) {
   if (score >= 70) return "text-[#00ff9f]";
   if (score >= 40) return "text-[#f59e0b]";
@@ -85,7 +81,6 @@ function estimateRisk(token: TokenPrice): number {
   return Math.max(0, Math.min(100, risk));
 }
 
-// --- SVG Portfolio Chart ---
 function PortfolioChart({ data, width = 500, height = 140 }: { data: number[]; width?: number; height?: number }) {
   const padding = { top: 12, bottom: 16, left: 0, right: 0 };
   const chartW = width - padding.left - padding.right;
@@ -103,21 +98,20 @@ function PortfolioChart({ data, width = 500, height = 140 }: { data: number[]; w
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto" preserveAspectRatio="none">
       <defs>
-        <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id="chartGradOv" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#00ff9f" stopOpacity="0.15" />
           <stop offset="100%" stopColor="#00ff9f" stopOpacity="0" />
         </linearGradient>
       </defs>
-      <path d={areaPath} fill="url(#chartGrad)" />
-      <polyline points={polyline} fill="none" stroke="#00ff9f" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d={areaPath} fill="url(#chartGradOv)" />
+      <polyline points={polyline} fill="none" stroke="#00ff9f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       {points.length > 0 && (
-        <circle cx={points[points.length - 1].x} cy={points[points.length - 1].y} r="3" fill="#0a0a0a" stroke="#00ff9f" strokeWidth="1.5" />
+        <circle cx={points[points.length - 1].x} cy={points[points.length - 1].y} r="3" fill="#0a0a0a" stroke="#00ff9f" strokeWidth="2" />
       )}
     </svg>
   );
 }
 
-// --- Component ---
 export default function DashboardOverview() {
   const { data: livePrices, loading: pricesLoading, error: pricesError } = useKnownTokenPrices();
   const { error: networkError } = useNetworkHealth();
@@ -144,56 +138,55 @@ export default function DashboardOverview() {
   }, []);
 
   return (
-    <div className="p-6 space-y-4">
-      {/* -- Row 1: Portfolio (7 cols) + Top Movers (5 cols) -- */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
-        {/* Portfolio Value */}
-        <div className="xl:col-span-7 bg-[#161616] border border-[#222] rounded-xl p-5">
-          <div className="flex items-center justify-between mb-1">
+    <div className="p-6 space-y-6">
+      {/* ===== Row 1: Portfolio Value (8 cols) + Top Movers + Network (4 cols) ===== */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+        {/* Portfolio — wider at 8 cols */}
+        <div className="xl:col-span-8 bg-[#161616] border border-[#222] rounded-xl p-6">
+          <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#00ff9f] animate-pulse" />
               <span className="font-mono text-[10px] text-[#52525b] uppercase tracking-wider">Portfolio Value</span>
             </div>
-            <div className="flex items-center gap-1 bg-[#111] rounded p-0.5">
+            <div className="flex items-center gap-1 bg-[#111] rounded-lg p-0.5">
               {(["7D", "30D"] as const).map((period) => (
-                <button key={period} className={["font-mono text-[9px] px-2 py-0.5 rounded transition-colors", chartPeriod === period ? "bg-[#00ff9f]/10 text-[#00ff9f]" : "text-[#52525b] hover:text-[#a1a1aa]"].join(" ")}>
+                <button key={period} className={["font-mono text-[10px] px-3 py-1 rounded-md transition-colors", chartPeriod === period ? "bg-[#00ff9f]/10 text-[#00ff9f]" : "text-[#52525b] hover:text-[#a1a1aa]"].join(" ")}>
                   {period}
                 </button>
               ))}
             </div>
           </div>
-          <div className="text-4xl font-semibold font-mono tracking-tight">
-            <CountUp value={Math.round(totalPortfolioUsd)} prefix="$" />
-          </div>
-          <div className="flex items-center gap-3 mt-1 mb-3">
-            <div className="flex items-center gap-1">
-              <TrendingUp className="w-3 h-3 text-[#00ff9f]" />
-              <span className="font-mono text-[11px] font-bold text-[#00ff9f]">
+          <div className="flex items-end gap-4 mb-4">
+            <div className="text-5xl font-semibold font-mono tracking-tight">
+              <CountUp value={Math.round(totalPortfolioUsd)} prefix="$" />
+            </div>
+            <div className="flex items-center gap-1 mb-1">
+              <TrendingUp className="w-4 h-4 text-[#00ff9f]" />
+              <span className="font-mono text-sm font-bold text-[#00ff9f]">
                 +${Math.round(totalPortfolioUsd - 12847)} ({(((totalPortfolioUsd / 12847) - 1) * 100).toFixed(2)}%)
               </span>
-              <span className="font-mono text-[9px] text-[#52525b] ml-0.5">24h</span>
+              <span className="font-mono text-xs text-[#52525b] ml-1">24h</span>
             </div>
-            <span className="font-mono text-[10px] text-[#52525b]">SOL: {formatCompactPrice(solPrice)}</span>
           </div>
           <PortfolioChart data={TREND_7D} />
         </div>
 
-        {/* Top Movers + Network */}
-        <div className="xl:col-span-5 space-y-4">
+        {/* Right sidebar — 4 cols */}
+        <div className="xl:col-span-4 space-y-6">
           {/* Top Movers */}
-          <div className="bg-[#161616] border border-[#222] rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <Activity className="w-3.5 h-3.5 text-[#3b82f6]" />
+          <div className="bg-[#161616] border border-[#222] rounded-xl p-5">
+            <div className="flex items-center gap-2 mb-4">
+              <Activity className="w-4 h-4 text-[#3b82f6]" />
               <span className="font-mono text-[10px] text-[#52525b] uppercase tracking-wider">Top Movers (24H)</span>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {[...tokens].sort((a, b) => Math.abs(b.priceChangeH24) - Math.abs(a.priceChangeH24)).slice(0, 5).map((t) => (
                 <div key={t.symbol} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-[11px] font-bold text-white">${t.symbol}</span>
-                    <span className="font-mono text-[10px] text-[#52525b]">{formatCompactPrice(t.priceUsd)}</span>
+                    <span className="font-mono text-[12px] font-bold text-white">${t.symbol}</span>
+                    <span className="font-mono text-[11px] text-[#52525b]">{formatCompactPrice(t.priceUsd)}</span>
                   </div>
-                  <span className={["font-mono text-[11px] font-bold", t.priceChangeH24 >= 0 ? "text-[#00ff9f]" : "text-[#ff3b5c]"].join(" ")}>
+                  <span className={["font-mono text-[12px] font-bold", t.priceChangeH24 >= 0 ? "text-[#00ff9f]" : "text-[#ff3b5c]"].join(" ")}>
                     {t.priceChangeH24 >= 0 ? "+" : ""}{t.priceChangeH24.toFixed(1)}%
                   </span>
                 </div>
@@ -201,28 +194,28 @@ export default function DashboardOverview() {
             </div>
           </div>
 
-          {/* Network Stats */}
-          <div className="bg-[#161616] border border-[#222] rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <Zap className="w-3.5 h-3.5 text-[#9945FF]" />
+          {/* Network */}
+          <div className="bg-[#161616] border border-[#222] rounded-xl p-5">
+            <div className="flex items-center gap-2 mb-4">
+              <Zap className="w-4 h-4 text-[#9945FF]" />
               <span className="font-mono text-[10px] text-[#52525b] uppercase tracking-wider">Solana Network</span>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <span className="font-mono text-[9px] text-[#52525b]">Daily Active Users</span>
-                <p className="font-mono text-[13px] font-bold text-white">4.16M</p>
+                <span className="font-mono text-[10px] text-[#52525b]">Daily Active Users</span>
+                <p className="font-mono text-[14px] font-bold text-white">4.16M</p>
               </div>
               <div>
-                <span className="font-mono text-[9px] text-[#52525b]">Transactions (24h)</span>
-                <p className="font-mono text-[13px] font-bold text-white">102.7M</p>
+                <span className="font-mono text-[10px] text-[#52525b]">Transactions (24h)</span>
+                <p className="font-mono text-[14px] font-bold text-white">102.7M</p>
               </div>
               <div>
-                <span className="font-mono text-[9px] text-[#52525b]">DeFi TVL</span>
-                <p className="font-mono text-[13px] font-bold text-[#ff3b5c]">$4.77B</p>
+                <span className="font-mono text-[10px] text-[#52525b]">DeFi TVL</span>
+                <p className="font-mono text-[14px] font-bold text-[#ff3b5c]">$4.77B</p>
               </div>
               <div>
-                <span className="font-mono text-[9px] text-[#52525b]">Status</span>
-                <p className={["font-mono text-[13px] font-bold", networkError ? "text-[#f59e0b]" : "text-[#00ff9f]"].join(" ")}>
+                <span className="font-mono text-[10px] text-[#52525b]">Status</span>
+                <p className={["font-mono text-[14px] font-bold", networkError ? "text-[#f59e0b]" : "text-[#00ff9f]"].join(" ")}>
                   {networkError ? "DEGRADED" : "ONLINE"}
                 </p>
               </div>
@@ -231,64 +224,62 @@ export default function DashboardOverview() {
         </div>
       </div>
 
-      {/* -- Row 2: Active Positions (5) + Whale Movements (7) -- */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
+      {/* ===== Row 2: Active Positions (5) + Whale Movements (7) ===== */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
         {/* Active Positions */}
-        <div className="xl:col-span-5 bg-[#161616] border border-[#222] rounded-xl p-4">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Eye className="w-3.5 h-3.5 text-[#00ff9f]" />
-              <span className="font-mono text-[10px] text-[#52525b] uppercase tracking-wider">Active Positions</span>
-              <span className="font-mono text-[10px] text-[#52525b]">(6)</span>
-            </div>
+        <div className="xl:col-span-5 bg-[#161616] border border-[#222] rounded-xl p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Eye className="w-4 h-4 text-[#00ff9f]" />
+            <span className="font-mono text-[10px] text-[#52525b] uppercase tracking-wider">Active Positions</span>
+            <span className="font-mono text-[10px] text-[#52525b]">(6)</span>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             {watchlist.slice(0, 6).map((pos) => (
-              <div key={pos.token} className="bg-[#111] rounded-lg p-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-[11px] font-bold text-white">${pos.token}</span>
-                  <span className={["font-mono text-[11px] font-bold", pos.change >= 0 ? "text-[#00ff9f]" : "text-[#ff3b5c]"].join(" ")}>
+              <div key={pos.token} className="bg-[#111] rounded-lg p-4">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-mono text-[12px] font-bold text-white">${pos.token}</span>
+                  <span className={["font-mono text-[12px] font-bold", pos.change >= 0 ? "text-[#00ff9f]" : "text-[#ff3b5c]"].join(" ")}>
                     {pos.change >= 0 ? "+" : ""}{pos.change.toFixed(1)}%
                   </span>
                 </div>
-                <div className="text-[10px] text-[#52525b] mt-1">{formatCompactPrice(pos.price)}</div>
-                <MiniSparkline data={pos.sparkline} color={pos.change >= 0 ? "#00ff9f" : "#ff3b5c"} width={80} height={24} />
+                <div className="text-[11px] text-[#52525b] mb-2">{formatCompactPrice(pos.price)}</div>
+                <MiniSparkline data={pos.sparkline} color={pos.change >= 0 ? "#00ff9f" : "#ff3b5c"} width={100} height={28} />
               </div>
             ))}
           </div>
         </div>
 
         {/* Whale Movements */}
-        <div className="xl:col-span-7 bg-[#161616] border border-[#222] rounded-xl p-4">
-          <div className="flex items-center justify-between mb-3">
+        <div className="xl:col-span-7 bg-[#161616] border border-[#222] rounded-xl p-5">
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#3b82f6] animate-pulse" />
               <span className="font-mono text-[10px] text-[#52525b] uppercase tracking-wider">Whale Movements (Live)</span>
             </div>
-            <span className="font-mono text-[9px] text-[#52525b]">Live from DexScreener</span>
+            <span className="font-mono text-[10px] text-[#52525b]">Live from DexScreener</span>
           </div>
           <table className="w-full text-sm font-mono">
             <thead>
               <tr className="text-[#52525b] text-[10px] border-b border-[#222]">
-                <th className="text-left py-2 px-2">Time</th>
-                <th className="text-left py-2 px-2">Wallet</th>
-                <th className="text-left py-2 px-2">Action</th>
-                <th className="text-left py-2 px-2">Token</th>
-                <th className="text-right py-2 px-2">Amount</th>
+                <th className="text-left py-2 px-3">Time</th>
+                <th className="text-left py-2 px-3">Wallet</th>
+                <th className="text-left py-2 px-3">Action</th>
+                <th className="text-left py-2 px-3">Token</th>
+                <th className="text-right py-2 px-3">Amount</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#222]">
               {FALLBACK_WHALES.map((m, i) => (
                 <tr key={i} className="hover:bg-[#1a1a1a]">
-                  <td className="py-2 px-2 text-[#52525b] text-[11px]">{m.time}</td>
-                  <td className="py-2 px-2 text-[#3b82f6] text-[11px]">{m.wallet}</td>
-                  <td className="py-2 px-2">
-                    <span className={["text-[10px] font-bold px-1.5 py-0.5 rounded", m.action === "BUY" ? "text-[#00ff9f] bg-[#00ff9f]/10" : "text-[#ff3b5c] bg-[#ff3b5c]/10"].join(" ")}>
+                  <td className="py-3 px-3 text-[#52525b] text-[11px]">{m.time}</td>
+                  <td className="py-3 px-3 text-[#3b82f6] text-[11px]">{m.wallet}</td>
+                  <td className="py-3 px-3">
+                    <span className={["text-[10px] font-bold px-2 py-0.5 rounded", m.action === "BUY" ? "text-[#00ff9f] bg-[#00ff9f]/10" : "text-[#ff3b5c] bg-[#ff3b5c]/10"].join(" ")}>
                       {m.action}
                     </span>
                   </td>
-                  <td className="py-2 px-2 text-white text-[11px]">{m.token}</td>
-                  <td className="py-2 px-2 text-right text-[#a1a1aa] text-[11px]">{formatNumber(m.amount)} SOL</td>
+                  <td className="py-3 px-3 text-white text-[11px]">{m.token}</td>
+                  <td className="py-3 px-3 text-right text-[#a1a1aa] text-[11px]">{formatNumber(m.amount)} SOL</td>
                 </tr>
               ))}
             </tbody>
@@ -296,44 +287,44 @@ export default function DashboardOverview() {
         </div>
       </div>
 
-      {/* -- Row 3: Live Watchlist (full width) -- */}
-      <div className="bg-[#161616] border border-[#222] rounded-xl p-4">
-        <div className="flex items-center justify-between mb-3">
+      {/* ===== Row 3: Live Watchlist (full width) ===== */}
+      <div className="bg-[#161616] border border-[#222] rounded-xl p-5">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-[#00ff9f] animate-pulse" />
             <span className="font-mono text-[10px] text-[#52525b] uppercase tracking-wider">Live Watchlist</span>
-            <span className="font-mono text-[9px] text-[#3b82f6] bg-[#3b82f6]/10 px-1.5 py-0.5 rounded">{watchlist.length} TOKENS</span>
+            <span className="font-mono text-[10px] text-[#3b82f6] bg-[#3b82f6]/10 px-2 py-0.5 rounded">{watchlist.length} TOKENS</span>
           </div>
-          <span className="font-mono text-[9px] text-[#52525b]">{pricesError ? "Fallback data" : "Real-time DexScreener"}</span>
+          <span className="font-mono text-[10px] text-[#52525b]">{pricesError ? "Fallback data" : "Real-time DexScreener"}</span>
         </div>
         <table className="w-full text-sm font-mono">
           <thead>
             <tr className="text-[#52525b] text-[10px] border-b border-[#222]">
-              <th className="text-left py-2 px-2">Token</th>
-              <th className="text-left py-2 px-2">Price</th>
-              <th className="text-left py-2 px-2">24h</th>
-              <th className="text-left py-2 px-2">Risk</th>
-              <th className="text-left py-2 px-2">Volume</th>
-              <th className="text-left py-2 px-2">Chart</th>
-              <th className="text-left py-2 px-2">Quick Sell</th>
+              <th className="text-left py-2 px-3">Token</th>
+              <th className="text-left py-2 px-3">Price</th>
+              <th className="text-left py-2 px-3">24h</th>
+              <th className="text-left py-2 px-3">Risk</th>
+              <th className="text-left py-2 px-3">Volume</th>
+              <th className="text-left py-2 px-3">Chart</th>
+              <th className="text-left py-2 px-3">Quick Sell</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#222]">
             {watchlist.map((t) => (
               <tr key={t.token} className="hover:bg-[#1a1a1a]">
-                <td className="py-2 px-2 text-[#00ff9f] font-bold text-[11px]">${t.token}</td>
-                <td className="py-2 px-2 text-white text-[11px]">{formatCompactPrice(t.price)}</td>
-                <td className={["py-2 px-2 font-bold text-[11px] flex items-center gap-1", t.change >= 0 ? "text-[#00ff9f]" : "text-[#ff3b5c]"].join(" ")}>
+                <td className="py-3 px-3 text-[#00ff9f] font-bold text-[12px]">${t.token}</td>
+                <td className="py-3 px-3 text-white text-[11px]">{formatCompactPrice(t.price)}</td>
+                <td className={["py-3 px-3 font-bold text-[11px] flex items-center gap-1", t.change >= 0 ? "text-[#00ff9f]" : "text-[#ff3b5c]"].join(" ")}>
                   {t.change >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                   {t.change >= 0 ? "+" : ""}{t.change.toFixed(1)}%
                 </td>
-                <td className="py-2 px-2">
+                <td className="py-3 px-3">
                   <span className={["font-bold text-[11px]", getScoreColor(t.risk)].join(" ")}>{t.risk}</span>
                   <span className="text-[#52525b] text-[10px]">/100</span>
                 </td>
-                <td className="py-2 px-2 text-[#52525b] text-[10px]">${formatNumber(t.volume)}</td>
-                <td className="py-2 px-2"><MiniSparkline data={t.sparkline} color={t.change >= 0 ? "#00ff9f" : "#ff3b5c"} width={64} height={20} /></td>
-                <td className="py-2 px-2"><QuickSellButtons symbol={t.token} onSell={handleQuickSell} /></td>
+                <td className="py-3 px-3 text-[#52525b] text-[11px]">${formatNumber(t.volume)}</td>
+                <td className="py-3 px-3"><MiniSparkline data={t.sparkline} color={t.change >= 0 ? "#00ff9f" : "#ff3b5c"} width={64} height={20} /></td>
+                <td className="py-3 px-3"><QuickSellButtons symbol={t.token} onSell={handleQuickSell} /></td>
               </tr>
             ))}
           </tbody>
