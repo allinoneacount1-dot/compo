@@ -17,6 +17,7 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children, title = "Overview", isMobileOpen = false, onMobileClose, onMobileMenuToggle }: DashboardLayoutProps) {
   const { isOpen, setIsOpen } = useCommandPalette();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Close mobile menu on resize to desktop
   useEffect(() => {
@@ -35,6 +36,8 @@ export function DashboardLayout({ children, title = "Overview", isMobileOpen = f
     setIsOpen(false);
   }, [setIsOpen]);
 
+  const sidebarW = sidebarCollapsed ? 72 : 260;
+
   return (
     <div className="h-[100dvh] overflow-hidden bg-[#0a0a0a]">
       {/* Mobile overlay when sidebar is open */}
@@ -42,20 +45,28 @@ export function DashboardLayout({ children, title = "Overview", isMobileOpen = f
         <div className="md:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" onClick={onMobileClose} aria-hidden="true" />
       )}
 
-      {/* Topbar: fixed 64px, no overlap */}
-      <TopBar title={title} onMobileMenuToggle={onMobileMenuToggle} />
+      {/* Sidebar: collapsible */}
+      <Sidebar
+        isMobileOpen={isMobileOpen}
+        onMobileClose={onMobileClose}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+      />
 
-      {/* Sidebar: fixed 260px, starts below topbar */}
-      <Sidebar isMobileOpen={isMobileOpen} onMobileClose={onMobileClose} />
+      {/* Topbar: fixed 64px */}
+      <TopBar title={title} onMobileMenuToggle={onMobileMenuToggle} sidebarCollapsed={sidebarCollapsed} />
 
       {/* Status bar */}
-      <StatusBar />
+      <StatusBar sidebarCollapsed={sidebarCollapsed} />
 
       {/* Command Palette */}
       <CommandPalette isOpen={isOpen} onClose={() => setIsOpen(false)} onNavigate={handleNavigate} />
 
       {/* Main content: scrollable, offset by topbar + sidebar */}
-      <main className="h-[calc(100dvh-64px)] overflow-y-auto overflow-x-auto md:ml-[260px] pt-16" style={{ paddingBottom: 28 }}>
+      <main
+        className="h-[calc(100dvh-64px)] overflow-y-auto overflow-x-auto pt-16 transition-all duration-300"
+        style={{ marginLeft: sidebarW, paddingBottom: 28 }}
+      >
         {children}
       </main>
     </div>

@@ -1,155 +1,132 @@
 "use client";
 
-import { type ReactNode, useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import {
-  LayoutDashboard, Search, Radar, Zap, Wallet, Bell, Trophy, Settings, Activity,
-  ChevronLeft, ChevronRight,
+  LayoutDashboard, ScanLine, Radio, Crosshair, Briefcase,
+  Bell, Trophy, Settings, Activity, ChevronLeft, ChevronRight,
+  Terminal,
 } from "lucide-react";
-
-interface NavItem {
-  label: string;
-  icon: ReactNode;
-  route: string;
-  badge?: number;
-}
-
-const navItems: NavItem[] = [
-  { label: "Overview", icon: <LayoutDashboard className="w-[18px] h-[18px]" />, route: "#/dashboard" },
-  { label: "Scanner", icon: <Search className="w-[18px] h-[18px]" />, route: "#/scanner" },
-  { label: "Whale Radar", icon: <Radar className="w-[18px] h-[18px]" />, route: "#/whales" },
-  { label: "Sniper", icon: <Zap className="w-[18px] h-[18px]" />, route: "#/sniper" },
-  { label: "Portfolio", icon: <Wallet className="w-[18px] h-[18px]" />, route: "#/portfolio" },
-  { label: "Alerts", icon: <Bell className="w-[18px] h-[18px]" />, route: "#/alerts", badge: 3 },
-  { label: "Leaderboard", icon: <Trophy className="w-[18px] h-[18px]" />, route: "#/leaderboard" },
-  { label: "On-Chain", icon: <Activity className="w-[18px] h-[18px]" />, route: "#/onchain" },
-  { label: "Settings", icon: <Settings className="w-[18px] h-[18px]" />, route: "#/settings" },
-];
 
 interface SidebarProps {
   isMobileOpen?: boolean;
   onMobileClose?: () => void;
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
-export function Sidebar({ isMobileOpen = false, onMobileClose }: SidebarProps) {
-  const [activeIndex, setActiveIndex] = useState(() => {
-    if (typeof window === "undefined") return 0;
-    const hash = window.location.hash || "#/dashboard";
-    const idx = navItems.findIndex((item) => hash.startsWith(item.route));
-    return idx >= 0 ? idx : 0;
-  });
+const NAV_ITEMS = [
+  { icon: LayoutDashboard, label: "Overview", route: "#/dashboard" },
+  { icon: ScanLine, label: "Scanner", route: "#/scanner" },
+  { icon: Radio, label: "Whale Radar", route: "#/whales" },
+  { icon: Crosshair, label: "Sniper", route: "#/sniper" },
+  { icon: Briefcase, label: "Portfolio", route: "#/portfolio" },
+  { icon: Bell, label: "Alerts", route: "#/alerts" },
+  { icon: Trophy, label: "Leaderboard", route: "#/leaderboard" },
+  { icon: Activity, label: "On-Chain Intel", route: "#/onchain" },
+  { icon: Settings, label: "Settings", route: "#/settings" },
+];
 
-  const [collapsed, setCollapsed] = useState(false);
+export function Sidebar({ isMobileOpen = false, onMobileClose, collapsed = false, onToggleCollapse }: SidebarProps) {
+  const [active, setActive] = useState("#/dashboard");
 
-  const navigateTo = useCallback((route: string) => {
+  const handleNav = (route: string) => {
+    setActive(route);
     window.location.hash = route;
-    const idx = navItems.findIndex((item) => item.route === route);
-    if (idx >= 0) setActiveIndex(idx);
     onMobileClose?.();
-  }, [onMobileClose]);
+  };
 
-  useEffect(() => {
-    const onHashChange = () => {
-      const hash = window.location.hash || "#/dashboard";
-      const idx = navItems.findIndex((item) => hash.startsWith(item.route));
-      if (idx >= 0) setActiveIndex(idx);
-    };
-    window.addEventListener("hashchange", onHashChange);
-    return () => window.removeEventListener("hashchange", onHashChange);
-  }, []);
+  const w = collapsed ? "w-[72px]" : "w-[260px]";
 
   return (
     <>
-      {/* Mobile: off-canvas drawer */}
+      {/* Desktop Sidebar */}
       <aside
         className={[
-          "md:hidden fixed inset-y-0 left-0 z-50 flex flex-col",
-          "bg-[#111111] border-r border-[#222]",
-          "w-[260px]",
-          "transition-transform duration-300 ease-out",
-          isMobileOpen ? "translate-x-0" : "-translate-x-full",
+          "hidden md:flex flex-col h-[100dvh] bg-[#111] border-r border-[#222]",
+          "fixed left-0 top-0 z-30 transition-all duration-300",
+          w,
         ].join(" ")}
-        style={{ top: 64, bottom: 28 }}
       >
-        <nav className="flex-1 py-3 overflow-y-auto">
-          {navItems.map((item, i) => (
-            <button
-              key={item.label}
-              onClick={() => navigateTo(item.route)}
-              className={[
-                "w-full flex items-center h-11 px-4 relative cursor-pointer",
-                "font-mono text-[13px] transition-colors duration-100 gap-3",
-                activeIndex === i
-                  ? "text-[#00ff9f] bg-[#1a1a1a]"
-                  : "text-[#52525b] hover:text-white hover:bg-[#1a1a1a]",
-              ].join(" ")}
-            >
-              {activeIndex === i && (
-                <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#00ff9f]" />
-              )}
-              <span className="flex-shrink-0 relative">
-                {item.icon}
-                {item.badge && (
-                  <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#ff3b5c] text-white text-[7px] flex items-center justify-center font-bold">
-                    {item.badge}
-                  </span>
-                )}
-              </span>
-              <span>{item.label}</span>
+        {/* Logo */}
+        <div className="h-16 flex items-center justify-between px-4 border-b border-[#222] shrink-0">
+          {!collapsed && (
+            <button onClick={() => handleNav("#/landing")} className="flex items-center gap-2 cursor-pointer">
+              <Terminal className="w-4 h-4 text-[#00ff9f]" />
+              <span className="font-mono font-bold text-[#00ff9f] text-sm tracking-[0.15em]">COMPO_</span>
             </button>
-          ))}
-        </nav>
-      </aside>
-
-      {/* Desktop: static sidebar, fixed, starts below topbar */}
-      <aside
-        className={[
-          "hidden md:flex fixed left-0 flex-col z-40",
-          "bg-[#111111] border-r border-[#222]",
-          "transition-[width] duration-200 ease-out",
-          collapsed ? "w-[60px]" : "w-[260px]",
-        ].join(" ")}
-        style={{ top: 64, bottom: 28 }}
-      >
-        {/* Navigation */}
-        <nav className="flex-1 py-3 overflow-y-auto">
-          {navItems.map((item, i) => (
-            <button
-              key={item.label}
-              onClick={() => navigateTo(item.route)}
-              title={collapsed ? item.label : undefined}
-              className={[
-                "w-full flex items-center h-11 relative cursor-pointer",
-                "font-mono text-[13px] transition-colors duration-100",
-                collapsed ? "justify-center px-0" : "gap-3 px-4",
-                activeIndex === i
-                  ? "text-[#00ff9f] bg-[#1a1a1a]"
-                  : "text-[#52525b] hover:text-white hover:bg-[#1a1a1a]",
-              ].join(" ")}
-            >
-              {activeIndex === i && (
-                <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#00ff9f]" />
-              )}
-              <span className="flex-shrink-0 relative">
-                {item.icon}
-                {item.badge && (
-                  <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#ff3b5c] text-white text-[7px] flex items-center justify-center font-bold">
-                    {item.badge}
-                  </span>
-                )}
-              </span>
-              {!collapsed && <span>{item.label}</span>}
+          )}
+          {collapsed && (
+            <button onClick={() => handleNav("#/landing")} className="mx-auto cursor-pointer">
+              <Terminal className="w-4 h-4 text-[#00ff9f]" />
             </button>
-          ))}
-        </nav>
+          )}
+        </div>
 
-        {/* Collapse toggle */}
+        {/* Collapse Toggle */}
         <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="flex items-center justify-center h-10 border-t border-[#222] text-[#52525b] hover:text-white transition-colors cursor-pointer"
+          onClick={onToggleCollapse}
+          className="hidden md:flex items-center justify-center h-8 border-b border-[#222] text-[#52525b] hover:text-white transition-colors shrink-0"
         >
           {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
         </button>
+
+        {/* Nav Items */}
+        <nav className="flex-1 overflow-y-auto py-2">
+          {NAV_ITEMS.map((item) => {
+            const Icon = item.icon;
+            const isActive = active === item.route;
+            return (
+              <button
+                key={item.route}
+                onClick={() => handleNav(item.route)}
+                title={collapsed ? item.label : undefined}
+                className={[
+                  "w-full flex items-center gap-3 h-10 px-4 transition-colors cursor-pointer",
+                  "hover:bg-[#1a1a1a]",
+                  isActive ? "bg-[#00ff9f]/5 text-[#00ff9f] border-r-[3px] border-r-[#00ff9f]" : "text-[#52525b]",
+                  collapsed ? "justify-center px-0" : "",
+                ].join(" ")}
+              >
+                <Icon className="w-4 h-4 shrink-0" />
+                {!collapsed && <span className="font-mono text-[11px] tracking-wider">{item.label}</span>}
+              </button>
+            );
+          })}
+        </nav>
       </aside>
+
+      {/* Mobile Sidebar */}
+      {isMobileOpen && (
+        <aside className="md:hidden fixed inset-y-0 left-0 z-50 w-[260px] bg-[#111] border-r border-[#222] flex flex-col">
+          <div className="h-16 flex items-center justify-between px-4 border-b border-[#222]">
+            <button onClick={() => handleNav("#/landing")} className="flex items-center gap-2 cursor-pointer">
+              <Terminal className="w-4 h-4 text-[#00ff9f]" />
+              <span className="font-mono font-bold text-[#00ff9f] text-sm tracking-[0.15em]">COMPO_</span>
+            </button>
+            <button onClick={onMobileClose} className="text-[#52525b] hover:text-white text-xl cursor-pointer">✕</button>
+          </div>
+          <nav className="flex-1 overflow-y-auto py-2">
+            {NAV_ITEMS.map((item) => {
+              const Icon = item.icon;
+              const isActive = active === item.route;
+              return (
+                <button
+                  key={item.route}
+                  onClick={() => handleNav(item.route)}
+                  className={[
+                    "w-full flex items-center gap-3 h-10 px-4 transition-colors cursor-pointer",
+                    "hover:bg-[#1a1a1a]",
+                    isActive ? "bg-[#00ff9f]/5 text-[#00ff9f] border-r-[3px] border-r-[#00ff9f]" : "text-[#52525b]",
+                  ].join(" ")}
+                >
+                  <Icon className="w-4 h-4 shrink-0" />
+                  <span className="font-mono text-[11px] tracking-wider">{item.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+        </aside>
+      )}
     </>
   );
 }

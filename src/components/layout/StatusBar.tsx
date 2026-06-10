@@ -2,7 +2,11 @@
 
 import { useState, useEffect } from "react";
 
-export function StatusBar() {
+interface StatusBarProps {
+  sidebarCollapsed?: boolean;
+}
+
+export function StatusBar({ sidebarCollapsed = false }: StatusBarProps) {
   const [slot, setSlot] = useState(284192447);
 
   useEffect(() => {
@@ -14,8 +18,12 @@ export function StatusBar() {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-50 h-7 flex items-center gap-4 px-6 md:ml-[260px]"
-      style={{ background: "#111111", borderTop: "1px solid #222" }}
+      className="fixed bottom-0 left-0 right-0 z-50 h-7 flex items-center gap-4 px-6 transition-all duration-300"
+      style={{
+        background: "#111111",
+        borderTop: "1px solid #222",
+        marginLeft: sidebarCollapsed ? 72 : 260,
+      }}
     >
       <span className="flex items-center gap-1.5">
         <span className="w-1.5 h-1.5 rounded-full bg-[#00ff9f] animate-pulse" />
