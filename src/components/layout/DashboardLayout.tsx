@@ -7,13 +7,14 @@ import { StatusBar } from "./StatusBar";
 
 interface DashboardLayoutProps {
   children: ReactNode;
+  title?: string;
 }
 
-export function DashboardLayout({ children }: DashboardLayoutProps) {
+export function DashboardLayout({ children, title = "Overview" }: DashboardLayoutProps) {
   return (
     <div className="h-[100dvh] overflow-hidden">
       <Sidebar />
-      <TopBar />
+      <TopBar title={title} />
       <StatusBar />
       <main
         className="h-[100dvh] overflow-y-auto"

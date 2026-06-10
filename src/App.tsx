@@ -8,8 +8,12 @@ import DashboardOverview from "./routes/dashboard/index";
 import ScannerPage from "./routes/dashboard/scanner";
 import WhalesPage from "./routes/dashboard/whales";
 import SniperPage from "./routes/dashboard/sniper";
+import PortfolioPage from "./routes/dashboard/portfolio";
+import AlertsPage from "./routes/dashboard/alerts";
+import LeaderboardPage from "./routes/dashboard/leaderboard";
+import SettingsPage from "./routes/dashboard/settings";
 
-type Page = "booting" | "landing" | "dashboard" | "scanner" | "whales" | "sniper";
+type Page = "booting" | "landing" | "dashboard" | "scanner" | "whales" | "sniper" | "portfolio" | "alerts" | "leaderboard" | "settings";
 
 function getInitialPage(): Page {
   if (typeof window === "undefined") return "booting";
@@ -17,22 +21,33 @@ function getInitialPage(): Page {
   if (hash.startsWith("/scanner")) return "scanner";
   if (hash.startsWith("/whales")) return "whales";
   if (hash.startsWith("/sniper")) return "sniper";
+  if (hash.startsWith("/portfolio")) return "portfolio";
+  if (hash.startsWith("/alerts")) return "alerts";
+  if (hash.startsWith("/leaderboard")) return "leaderboard";
+  if (hash.startsWith("/settings")) return "settings";
   if (hash.startsWith("/dashboard")) return "dashboard";
   if (hash === "/landing") return "landing";
   return "booting";
+}
+
+function getPageTitle(page: Page): string {
+  switch (page) {
+    case "scanner": return "Scanner";
+    case "whales": return "Whale Radar";
+    case "sniper": return "Sniper";
+    case "portfolio": return "Portfolio";
+    case "alerts": return "Alerts";
+    case "leaderboard": return "Leaderboard";
+    case "settings": return "Settings";
+    default: return "Overview";
+  }
 }
 
 function App() {
   const [page, setPage] = useState<Page>(getInitialPage);
 
   const handleHash = useCallback(() => {
-    const hash = window.location.hash.replace("#", "") || "/";
-    if (hash.startsWith("/scanner")) setPage("scanner");
-    else if (hash.startsWith("/whales")) setPage("whales");
-    else if (hash.startsWith("/sniper")) setPage("sniper");
-    else if (hash.startsWith("/dashboard")) setPage("dashboard");
-    else if (hash === "/landing") setPage("landing");
-    else setPage("landing");
+    setPage(getInitialPage());
   }, []);
 
   useEffect(() => {
@@ -59,11 +74,23 @@ function App() {
     case "sniper":
       content = <SniperPage />;
       break;
+    case "portfolio":
+      content = <PortfolioPage />;
+      break;
+    case "alerts":
+      content = <AlertsPage />;
+      break;
+    case "leaderboard":
+      content = <LeaderboardPage />;
+      break;
+    case "settings":
+      content = <SettingsPage />;
+      break;
     default:
       content = <DashboardOverview />;
   }
 
-  return <DashboardLayout>{content}</DashboardLayout>;
+  return <DashboardLayout title={getPageTitle(page)}>{content}</DashboardLayout>;
 }
 
 export default App;

@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useState, useEffect, useCallback } from "react";
 import {
   LayoutDashboard,
   Search,
@@ -15,19 +15,19 @@ import {
 interface NavItem {
   label: string;
   icon: ReactNode;
+  route: string;
   badge?: number;
-  active?: boolean;
 }
 
 const navItems: NavItem[] = [
-  { label: "Overview", icon: <LayoutDashboard className="w-5 h-5" />, active: true },
-  { label: "Scanner", icon: <Search className="w-5 h-5" /> },
-  { label: "Whale Radar", icon: <Radar className="w-5 h-5" /> },
-  { label: "Sniper", icon: <Zap className="w-5 h-5" /> },
-  { label: "Portfolio", icon: <Wallet className="w-5 h-5" /> },
-  { label: "Alerts", icon: <Bell className="w-5 h-5" />, badge: 3 },
-  { label: "Leaderboard", icon: <Trophy className="w-5 h-5" /> },
-  { label: "Settings", icon: <Settings className="w-5 h-5" /> },
+  { label: "Overview", icon: <LayoutDashboard className="w-5 h-5" />, route: "#/dashboard" },
+  { label: "Scanner", icon: <Search className="w-5 h-5" />, route: "#/scanner" },
+  { label: "Whale Radar", icon: <Radar className="w-5 h-5" />, route: "#/whales" },
+  { label: "Sniper", icon: <Zap className="w-5 h-5" />, route: "#/sniper" },
+  { label: "Portfolio", icon: <Wallet className="w-5 h-5" />, route: "#/portfolio" },
+  { label: "Alerts", icon: <Bell className="w-5 h-5" />, route: "#/alerts", badge: 3 },
+  { label: "Leaderboard", icon: <Trophy className="w-5 h-5" />, route: "#/leaderboard" },
+  { label: "Settings", icon: <Settings className="w-5 h-5" />, route: "#/settings" },
 ];
 
 interface SidebarProps {
@@ -36,7 +36,28 @@ interface SidebarProps {
 }
 
 export function Sidebar({ collapsed = false }: SidebarProps) {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(() => {
+    if (typeof window === "undefined") return 0;
+    const hash = window.location.hash || "#/dashboard";
+    const idx = navItems.findIndex((item) => hash.startsWith(item.route));
+    return idx >= 0 ? idx : 0;
+  });
+
+  const navigateTo = useCallback((route: string) => {
+    window.location.hash = route;
+    const idx = navItems.findIndex((item) => item.route === route);
+    if (idx >= 0) setActiveIndex(idx);
+  }, []);
+
+  useEffect(() => {
+    const onHashChange = () => {
+      const hash = window.location.hash || "#/dashboard";
+      const idx = navItems.findIndex((item) => hash.startsWith(item.route));
+      if (idx >= 0) setActiveIndex(idx);
+    };
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
 
   return (
     <aside
@@ -70,9 +91,9 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
         {navItems.map((item, i) => (
           <button
             key={item.label}
-            onClick={() => setActiveIndex(i)}
+            onClick={() => navigateTo(item.route)}
             className={[
-              "w-full flex items-center h-10 px-4 relative",
+              "w-full flex items-center h-10 px-4 relative cursor-pointer",
               "font-mono text-[13px] transition-colors duration-100",
               collapsed ? "justify-center" : "gap-3",
               activeIndex === i
