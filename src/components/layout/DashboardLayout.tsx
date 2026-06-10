@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { ReactNode } from "react";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
 import { StatusBar } from "./StatusBar";
+import { CommandPalette, useCommandPalette } from "../ui/CommandPalette";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -15,6 +16,8 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children, title = "Overview", isMobileOpen = false, onMobileClose, onMobileMenuToggle }: DashboardLayoutProps) {
+  const { isOpen, setIsOpen } = useCommandPalette();
+
   // Close mobile menu on resize to desktop
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)");
@@ -27,15 +30,16 @@ export function DashboardLayout({ children, title = "Overview", isMobileOpen = f
     return () => mq.removeEventListener("change", handler as any);
   }, [isMobileOpen, onMobileClose]);
 
+  const handleNavigate = useCallback((route: string) => {
+    window.location.hash = route;
+    setIsOpen(false);
+  }, [setIsOpen]);
+
   return (
     <div className="h-[100dvh] overflow-hidden bg-[#0a0a0a]">
       {/* Mobile overlay when sidebar is open */}
       {isMobileOpen && (
-        <div
-          className="md:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
-          onClick={onMobileClose}
-          aria-hidden="true"
-        />
+        <div className="md:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" onClick={onMobileClose} aria-hidden="true" />
       )}
 
       {/* Topbar: fixed 64px, no overlap */}
@@ -47,11 +51,11 @@ export function DashboardLayout({ children, title = "Overview", isMobileOpen = f
       {/* Status bar */}
       <StatusBar />
 
+      {/* Command Palette */}
+      <CommandPalette isOpen={isOpen} onClose={() => setIsOpen(false)} onNavigate={handleNavigate} />
+
       {/* Main content: scrollable, offset by topbar + sidebar */}
-      <main
-        className="h-[calc(100dvh-64px)] overflow-y-auto overflow-x-auto md:ml-[260px] pt-16"
-        style={{ paddingBottom: 28 }}
-      >
+      <main className="h-[calc(100dvh-64px)] overflow-y-auto overflow-x-auto md:ml-[260px] pt-16" style={{ paddingBottom: 28 }}>
         {children}
       </main>
     </div>

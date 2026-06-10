@@ -10,6 +10,7 @@ import { formatNumber } from "../../lib/utils/format";
 import { MiniSparkline, QuickSellButtons } from "../../components/ui/MiniSparkline";
 import { useKnownTokenPrices, useNetworkHealth } from "../../lib/hooks/useDexScreener";
 import type { TokenPrice } from "../../lib/hooks/useDexScreener";
+import { QuickWatchlist } from "../../components/ui/QuickWatchlist";
 
 const FALLBACK_WATCHLIST = [
   { symbol: "SOL", name: "Solana", address: "So11111111111111111111111111111111111111112", priceUsd: 178, priceChangeH24: 2.1, volumeH24: 8500000, liquidityUsd: 95000000, txnsH24: { buys: 12400, sells: 9800 } },
@@ -221,6 +222,9 @@ export default function DashboardOverview() {
               </div>
             </div>
           </div>
+
+          {/* Quick Watchlist */}
+          <QuickWatchlist />
         </div>
       </div>
 
