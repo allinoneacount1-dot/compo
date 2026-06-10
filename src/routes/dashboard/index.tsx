@@ -24,7 +24,7 @@ import {
 } from "../../lib/hooks/useDexScreener";
 import type { TokenPrice } from "../../lib/hooks/useDexScreener";
 
-// ─── Fallback mock data (used when API is loading or errors) ─────────────────
+// --- Fallback mock data (used when API is loading or errors) -----------------
 
 const FALLBACK_WATCHLIST = [
   { symbol: "SOL", name: "Solana", address: "So11111111111111111111111111111111111111112", priceUsd: 178, priceChangeH24: 2.1, volumeH24: 8500000, liquidityUsd: 95000000, txnsH24: { buys: 12400, sells: 9800 } },
@@ -40,7 +40,7 @@ const FALLBACK_ALERTS = [
   { token: "$WIF", action: "LP Pulled", amount: "847 SOL", time: "8m ago", variant: "danger" as const, icon: <ArrowDownRight className="w-3.5 h-3.5" /> },
   { token: "$POPCAT", action: "Whale Sell", amount: "120 SOL", time: "14m ago", variant: "warning" as const, icon: <ArrowDownRight className="w-3.5 h-3.5" /> },
   { token: "$PYTH", action: "New Listing", amount: "Raydium", time: "22m ago", variant: "success" as const, icon: <ArrowUpRight className="w-3.5 h-3.5" /> },
-  { token: "$MOODENG", action: "Honeypot Alert", amount: "—", time: "31m ago", variant: "danger" as const, icon: <ShieldX className="w-3.5 h-3.5" /> },
+  { token: "$MOODENG", action: "Honeypot Alert", amount: "--", time: "31m ago", variant: "danger" as const, icon: <ShieldX className="w-3.5 h-3.5" /> },
 ];
 
 const FALLBACK_WHALES = [
@@ -53,7 +53,7 @@ const FALLBACK_WHALES = [
 
 const TREND_7D = [11200, 11800, 11400, 12100, 11900, 12400, 12847];
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 function getScoreColor(score: number) {
   if (score >= 70) return "text-[#00FF9F]";
@@ -109,7 +109,7 @@ function estimateRisk(token: TokenPrice): number {
   return Math.max(0, Math.min(100, risk));
 }
 
-// ─── SVG Portfolio Chart ─────────────────────────────────────────────────────
+// --- SVG Portfolio Chart -----------------------------------------------------
 
 function PortfolioChart({ data, width = 500, height = 140 }: { data: number[]; width?: number; height?: number }) {
   const padding = { top: 12, bottom: 16, left: 0, right: 0 };
@@ -147,7 +147,7 @@ function PortfolioChart({ data, width = 500, height = 140 }: { data: number[]; w
   );
 }
 
-// ─── Real-time Price Ticker Bar ───────────────────────────────────────────────
+// --- Real-time Price Ticker Bar -----------------------------------------------
 
 function LiveTicker({ tokens }: { tokens: TokenPrice[] }) {
   if (tokens.length === 0) return null;
@@ -170,14 +170,14 @@ function LiveTicker({ tokens }: { tokens: TokenPrice[] }) {
   );
 }
 
-// ─── Live Data Banner ─────────────────────────────────────────────────────────
+// --- Live Data Banner ---------------------------------------------------------
 
 function DataStatusBanner({ lastUpdate, isLoading, error }: { lastUpdate: Date | null; isLoading: boolean; error: string | null }) {
   return (
     <div className="flex items-center gap-3 px-3 py-1.5 text-[10px] font-mono border-b border-[rgba(255,255,255,0.04)]">
       <div className="flex items-center gap-1.5">
         <span className={["w-1.5 h-1.5 rounded-full", error ? "bg-[#FF3B5C]" : isLoading ? "bg-[#FFB800] animate-pulse" : "bg-[#00FF9F]"].join(" ")} />
-        <span className={error ? "text-[#FF3B5C]" : "text-[#00FF9F]"}>{error ? "DEGRADED (FALLBACK DATA)" : "LIVE DATA — DEXSCREENER"}</span>
+        <span className={error ? "text-[#FF3B5C]" : "text-[#00FF9F]"}>{error ? "DEGRADED (FALLBACK DATA)" : "LIVE DATA -- DEXSCREENER"}</span>
       </div>
       {lastUpdate && (
         <span className="text-[#525252]">
@@ -188,7 +188,7 @@ function DataStatusBanner({ lastUpdate, isLoading, error }: { lastUpdate: Date |
   );
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// --- Component ----------------------------------------------------------------
 
 export default function DashboardOverview() {
   const { data: livePrices, loading: pricesLoading, error: pricesError } = useKnownTokenPrices();
@@ -231,9 +231,9 @@ export default function DashboardOverview() {
       <LiveTicker tokens={tokens.slice(0, 8)} />
 
       <div className="p-2.5 space-y-2.5">
-        {/* ── Row 1: Portfolio + Network Stats ── */}
+        {/* -- Row 1: Portfolio + Network Stats -- */}
         <div className="grid grid-cols-12 gap-2.5">
-          {/* Portfolio Value — 7 cols */}
+          {/* Portfolio Value -- 7 cols */}
           <div className="col-span-12 lg:col-span-7">
             <Card hoverable>
               <div className="flex items-center justify-between mb-0.5">
@@ -287,7 +287,7 @@ export default function DashboardOverview() {
             </Card>
           </div>
 
-          {/* Real-time Network + Token Stats — 5 cols */}
+          {/* Real-time Network + Token Stats -- 5 cols */}
           <div className="col-span-12 lg:col-span-5 space-y-2.5">
             {/* Solana Network Card */}
             <Card hoverable>
@@ -343,7 +343,7 @@ export default function DashboardOverview() {
           </div>
         </div>
 
-        {/* ── Row 2: Stats Cards ── */}
+        {/* -- Row 2: Stats Cards -- */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
           {[
             { label: "Active Positions", value: tokens.length.toString(), sub: "tokens tracked", icon: <Eye className="w-3 h-3" />, color: "text-[#00FF9F]" },
@@ -362,9 +362,9 @@ export default function DashboardOverview() {
           ))}
         </div>
 
-        {/* ── Row 3: Active Alerts + Whale Movements ── */}
+        {/* -- Row 3: Active Alerts + Whale Movements -- */}
         <div className="grid grid-cols-12 gap-2.5">
-          {/* Active Alerts — 4 cols */}
+          {/* Active Alerts -- 4 cols */}
           <div className="col-span-12 lg:col-span-4">
             <Card hoverable>
               <div className="flex items-center justify-between mb-1.5">
@@ -409,14 +409,14 @@ export default function DashboardOverview() {
             </Card>
           </div>
 
-          {/* Whale Movements — 8 cols */}
+          {/* Whale Movements -- 8 cols */}
           <div className="col-span-12 lg:col-span-8">
             <Card hoverable>
               <div className="flex items-center justify-between mb-1.5">
                 <div className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#3b82f6] animate-pulse" />
                   <span className="font-mono text-[9px] text-[#525252] uppercase tracking-wider">
-                    Whale Movements — Top Volume
+                    Whale Movements -- Top Volume
                   </span>
                 </div>
                 <span className="font-mono text-[9px] text-[#525252]">Live from DexScreener</span>
@@ -446,7 +446,7 @@ export default function DashboardOverview() {
           </div>
         </div>
 
-        {/* ── Row 4: Live Watchlist ── */}
+        {/* -- Row 4: Live Watchlist -- */}
         <div className="grid grid-cols-12 gap-2.5">
           <div className="col-span-12">
             <Card hoverable>
@@ -459,7 +459,7 @@ export default function DashboardOverview() {
                   </span>
                 </div>
                 <span className="font-mono text-[9px] text-[#525252]">
-                  {pricesError ? "Fallback data — API error" : "Real-time from DexScreener"}
+                  {pricesError ? "Fallback data -- API error" : "Real-time from DexScreener"}
                 </span>
               </div>
               <div className="space-y-0">

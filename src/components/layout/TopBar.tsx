@@ -13,7 +13,7 @@ interface TopBarProps {
 }
 
 export function TopBar({ title = "Overview", actions, isMobileOpen = false, onMobileMenuToggle }: TopBarProps) {
-  // Mock wallet state — would come from zustand store in real app
+  // Mock wallet state -- would come from zustand store in real app
   const walletConnected = false;
   const walletAddress = "0x7a3F8e2B9c4D1e5F6a7B3C8d9E0f2A1b4c5D3f2e";
 
@@ -27,7 +27,7 @@ export function TopBar({ title = "Overview", actions, isMobileOpen = false, onMo
     >
       {/* Left: Hamburger (mobile) + Page title */}
       <div className="flex items-center gap-2 md:gap-3 min-w-0">
-        {/* Hamburger menu — mobile only, animated */}
+        {/* Hamburger menu -- mobile only, animated */}
         <button
           onClick={onMobileMenuToggle}
           className="md:hidden w-9 h-9 flex items-center justify-center rounded hover:bg-[rgba(255,255,255,0.06)] transition-colors cursor-pointer relative"

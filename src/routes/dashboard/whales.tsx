@@ -46,7 +46,7 @@ import {
 } from "../../lib/utils/format";
 import { cn } from "../../lib/utils/cn";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// --- Types -------------------------------------------------------------------
 
 type TxAction = "BUY" | "SELL" | "TRANSFER" | "MINT";
 
@@ -94,7 +94,7 @@ interface WalletProfile {
   pnlChartData: number[];
 }
 
-// ─── Mock Data ───────────────────────────────────────────────────────────────
+// --- Mock Data ---------------------------------------------------------------
 
 const MOCK_LIVE_TX: LiveTx[] = [
   {
@@ -208,7 +208,7 @@ const MOCK_NOTABLE: NotableMovement[] = [
   {
     id: "n2",
     icon: "⚠️",
-    text: "Known ruggers wallet active — 0x7a3...3f2e",
+    text: "Known ruggers wallet active -- 0x7a3...3f2e",
     type: "warning",
     time: "5m ago",
   },
@@ -238,7 +238,7 @@ const MOCK_WALLET_PROFILE: WalletProfile = {
   pnlChartData: [120, 145, 132, 168, 155, 189, 210, 198, 234, 256, 243, 278, 265, 290, 312, 298, 324, 345, 330, 358],
 };
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// --- Helpers -----------------------------------------------------------------
 
 function getActionBadgeVariant(action: TxAction): "success" | "danger" | "info" | "warning" {
   switch (action) {
@@ -270,7 +270,7 @@ function formatSOLAmountDisplay(sol: number): string {
   return formatSOLAmount(sol);
 }
 
-// ─── Copy Button Component ───────────────────────────────────────────────────
+// --- Copy Button Component ---------------------------------------------------
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
@@ -302,7 +302,7 @@ function CopyButton({ text }: { text: string }) {
   );
 }
 
-// ─── PnL Mini Chart ──────────────────────────────────────────────────────────
+// --- PnL Mini Chart ----------------------------------------------------------
 
 function PnLChart({ data }: { data: number[] }) {
   const max = Math.max(...data);
@@ -371,7 +371,7 @@ function PnLChart({ data }: { data: number[] }) {
   );
 }
 
-// ─── Live Dot ────────────────────────────────────────────────────────────────
+// --- Live Dot ----------------------------------------------------------------
 
 function LiveDot() {
   return (
@@ -382,7 +382,7 @@ function LiveDot() {
   );
 }
 
-// ─── Wallet Profile Modal ────────────────────────────────────────────────────
+// --- Wallet Profile Modal ----------------------------------------------------
 
 function WalletProfileModal({
   profile,
@@ -550,7 +550,7 @@ function WalletProfileModal({
                       ? `+${trade.pnlSOL}`
                       : trade.pnlSOL < 0
                         ? trade.pnlSOL
-                        : "—"}
+                        : "--"}
                   </span>
                 </TableRow>
               ))}
@@ -590,7 +590,7 @@ function WalletProfileModal({
   );
 }
 
-// ─── Main Component ──────────────────────────────────────────────────────────
+// --- Main Component ----------------------------------------------------------
 
 export default function WhaleRadar() {
   const [selectedWallet, setSelectedWallet] = useState<WalletProfile | null>(null);
@@ -658,7 +658,7 @@ export default function WhaleRadar() {
   return (
     <>
     <div className="p-3 space-y-3 max-w-[1400px]">
-        {/* ── 1. Stats Bar ── */}
+        {/* -- 1. Stats Bar -- */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {stats.map((stat) => (
             <Card key={stat.label}>
@@ -675,9 +675,9 @@ export default function WhaleRadar() {
           ))}
         </div>
 
-        {/* ── 2. Main Content: Live Feed + Top Movers ── */}
+        {/* -- 2. Main Content: Live Feed + Top Movers -- */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-3">
-          {/* ── Live Feed (60%) ── */}
+          {/* -- Live Feed (60%) -- */}
           <div className="lg:col-span-3">
             <Card className="h-full">
               <div className="flex items-center justify-between mb-2">
@@ -810,7 +810,7 @@ export default function WhaleRadar() {
                       <div className="flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#00ff41] animate-pulse" />
                         <span className="font-mono text-[9px] text-[#00ff41]">
-                          {[minBuySOL && `Buy > ${minBuySOL} SOL`, watchlistOnly && "Watchlist"].filter(Boolean).join(" · ")}
+                          {[minBuySOL && `Buy > ${minBuySOL} SOL`, watchlistOnly && "Watchlist"].filter(Boolean).join(" . ")}
                         </span>
                       </div>
                     )}
@@ -916,7 +916,7 @@ export default function WhaleRadar() {
             </Card>
           </div>
 
-          {/* ── Top Movers (40%) ── */}
+          {/* -- Top Movers (40%) -- */}
           <div className="lg:col-span-2 space-y-4">
             {/* Whale Leaderboard */}
             <Card>
@@ -1030,7 +1030,7 @@ export default function WhaleRadar() {
         </div>
       </div>
 
-      {/* ── Wallet Profile Modal ── */}
+      {/* -- Wallet Profile Modal -- */}
       <AnimatePresence>
         {selectedWallet && (
           <WalletProfileModal

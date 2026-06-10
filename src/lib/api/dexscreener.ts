@@ -1,11 +1,11 @@
-// ─── DexScreener API Client ───────────────────────────────────────────────────
+// --- DexScreener API Client ---------------------------------------------------
 // Docs: https://docs.dexscreener.com/api/reference
 // Rate limits: 60 req/min (profiles), 300 req/min (pairs, search, tokens)
 
 const BASE_URL = "https://api.dexscreener.com";
 const CHAIN_ID = "solana";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 export interface DexPair {
   chainId: string;
@@ -99,7 +99,7 @@ export interface TrendingMeta {
   marketCapChange: { m5: number; h1: number; h6: number; h24: number };
 }
 
-// ─── Known Solana token addresses ─────────────────────────────────────────────
+// --- Known Solana token addresses ---------------------------------------------
 
 export const KNOWN_TOKENS = {
   SOL: "So11111111111111111111111111111111111111112",
@@ -116,12 +116,12 @@ export const KNOWN_TOKENS = {
   DRIFT: "DrfgYo89DNoq2eaQvh3L3aMXFcDt1HxK5sKYbtNbw8SU1gP"
 } as const;
 
-// ─── API Functions ────────────────────────────────────────────────────────────
+// --- API Functions ------------------------------------------------------------
 
 async function fetchJSON<T>(url: string): Promise<T> {
   const res = await fetch(url, { signal: AbortSignal.timeout(15_000) });
   if (!res.ok) {
-    throw new Error(`DexScreener API error: ${res.status} ${res.statusText} — ${url}`);
+    throw new Error(`DexScreener API error: ${res.status} ${res.statusText} -- ${url}`);
   }
   return res.json() as Promise<T>;
 }
@@ -194,7 +194,7 @@ export async function getTrendingMetas(): Promise<TrendingMeta[]> {
   return fetchJSON<TrendingMeta[]>(url);
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 /**
  * Extract a flat list of unique tokens from pairs, picking best liquidity per token.
@@ -242,7 +242,7 @@ export function extractUniqueTokens(pairs: DexPair[]): {
 }
 
 /**
- * Build watchlist from known tokens — fetches their pair data and formats.
+ * Build watchlist from known tokens -- fetches their pair data and formats.
  */
 export async function fetchKnownTokenPrices(): Promise<
   {

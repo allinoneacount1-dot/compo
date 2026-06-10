@@ -37,7 +37,7 @@ import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 import { cn } from "../../lib/utils/cn";
 
-// ─── Types ───
+// --- Types ---
 
 type AlertType = "price_above" | "price_below" | "whale_move" | "volume_spike" | "trending";
 type AlertStatus = "active" | "triggered" | "disabled";
@@ -72,7 +72,7 @@ interface NotificationSettings {
   push: boolean;
 }
 
-// ─── Constants ───
+// --- Constants ---
 
 const ALERT_TYPE_CONFIG: Record<AlertType, { label: string; icon: typeof TrendingUp; color: string; bg: string }> = {
   price_above: { label: "Price Above", icon: TrendingUp, color: "text-[#10b981]", bg: "rgba(16,185,129,0.12)" },
@@ -93,7 +93,7 @@ const TOKEN_OPTIONS = [
   "MEW", "NEIRO", "TREMP", "BODEN", "PONKE", "COK", "HARAMBE", "DUKO", "GME", "AMC",
 ];
 
-// ─── Mock Data ───
+// --- Mock Data ---
 
 const MOCK_ALERTS: Alert[] = [
   {
@@ -207,7 +207,7 @@ const MOCK_HISTORY: AlertHistoryEntry[] = [
   { id: "h10", triggeredAt: new Date(Date.now() - 1000 * 60 * 1440), token: "dogwifhat", symbol: "WIF", condition: "Price < $2.60", priceAtTrigger: 2.58 },
 ];
 
-// ─── Helpers ───
+// --- Helpers ---
 
 function formatPrice(price: number): string {
   if (price >= 1) return `$${price.toFixed(2)}`;
@@ -233,7 +233,7 @@ function formatTimestamp(date: Date): string {
   });
 }
 
-// ─── Toggle Component ───
+// --- Toggle Component ---
 
 function Toggle({ enabled, onToggle }: { enabled: boolean; onToggle: () => void }) {
   return (
@@ -253,7 +253,7 @@ function Toggle({ enabled, onToggle }: { enabled: boolean; onToggle: () => void 
   );
 }
 
-// ─── Main Component ───
+// --- Main Component ---
 
 export default function AlertsPage() {
   // State
@@ -285,7 +285,7 @@ export default function AlertsPage() {
     push: false,
   });
 
-  // Derived data — filter + sort
+  // Derived data -- filter + sort
   const filteredAlerts = useMemo(() => {
     const base = filterTab === "all" ? alerts : alerts.filter((a) => a.status === filterTab);
     return [...base].sort((a, b) => {
@@ -418,9 +418,9 @@ export default function AlertsPage() {
 
   return (
       <div className="p-3 space-y-3 max-w-[1280px]">
-        {/* ═══════════════════════════════════════════════════════════════
+        {/* ===============================================================
             PAGE HEADER
-        ═══════════════════════════════════════════════════════════════ */}
+        =============================================================== */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded bg-[rgba(0,255,65,0.1)] flex items-center justify-center">
@@ -455,9 +455,9 @@ export default function AlertsPage() {
           </div>
         </div>
 
-        {/* ═══════════════════════════════════════════════════════════════
+        {/* ===============================================================
             1. ALERT SUMMARY BAR
-        ═══════════════════════════════════════════════════════════════ */}
+        =============================================================== */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {/* Active Alerts */}
           <Card>
@@ -524,9 +524,9 @@ export default function AlertsPage() {
           </Card>
         </div>
 
-        {/* ═══════════════════════════════════════════════════════════════
+        {/* ===============================================================
             2. CREATE NEW ALERT FORM
-        ═══════════════════════════════════════════════════════════════ */}
+        =============================================================== */}
         {showCreateForm && (
           <Card className="border-[rgba(0,255,65,0.15)]">
             <div className="flex items-center gap-2 mb-4">
@@ -686,9 +686,9 @@ export default function AlertsPage() {
           </Card>
         )}
 
-        {/* ═══════════════════════════════════════════════════════════════
+        {/* ===============================================================
             2.5. AI-SUGGESTED RULES
-        ═══════════════════════════════════════════════════════════════ */}
+        =============================================================== */}
         <Card className="border-[rgba(168,85,247,0.15)]">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -776,9 +776,9 @@ export default function AlertsPage() {
           </div>
         </Card>
 
-        {/* ═══════════════════════════════════════════════════════════════
+        {/* ===============================================================
             3. ACTIVE ALERTS LIST
-        ═══════════════════════════════════════════════════════════════ */}
+        =============================================================== */}
         <Card>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
@@ -1013,9 +1013,9 @@ export default function AlertsPage() {
           </div>
         </Card>
 
-        {/* ═══════════════════════════════════════════════════════════════
+        {/* ===============================================================
             4. ALERT HISTORY + NOTIFICATION SETTINGS (2-col)
-        ═══════════════════════════════════════════════════════════════ */}
+        =============================================================== */}
         <div className="grid lg:grid-cols-[1fr_380px] gap-3">
           {/* Alert History Table */}
           <Card>

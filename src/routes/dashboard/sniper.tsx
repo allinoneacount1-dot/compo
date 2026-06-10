@@ -39,7 +39,7 @@ import {
 } from "../../lib/utils/format";
 import { cn } from "../../lib/utils/cn";
 
-// ─── Types ───
+// --- Types ---
 
 interface ActivePosition {
   id: string;
@@ -74,7 +74,7 @@ interface FollowedWallet {
   winRate: number;
 }
 
-// ─── Mock Data ───
+// --- Mock Data ---
 
 const PRESET_TOKENS = [
   { label: "BONK", address: "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263" },
@@ -259,7 +259,7 @@ const MOCK_FOLLOWED: FollowedWallet[] = [
   },
 ];
 
-// ─── Mini Sparkline ───
+// --- Mini Sparkline ---
 
 function MiniSparkline({ data, color }: { data: number[]; color: string }) {
   const min = Math.min(...data);
@@ -285,7 +285,7 @@ function MiniSparkline({ data, color }: { data: number[]; color: string }) {
   );
 }
 
-// ─── Toggle ───
+// --- Toggle ---
 
 function Toggle({
   enabled,
@@ -308,7 +308,7 @@ function Toggle({
   );
 }
 
-// ─── Type badge colors ───
+// --- Type badge colors ---
 
 function TypeBadge({ type }: { type: HistoryEntry["type"] }) {
   const styles: Record<string, string> = {
@@ -328,7 +328,7 @@ function TypeBadge({ type }: { type: HistoryEntry["type"] }) {
   );
 }
 
-// ─── Main Component ───
+// --- Main Component ---
 
 export default function SniperCenter() {
   const [contractAddress, setContractAddress] = useState("");
@@ -382,9 +382,9 @@ export default function SniperCenter() {
 
   return (
       <div className="p-4 space-y-5 max-w-[1280px]">
-        {/* ═══════════════════════════════════════════════════════════════
+        {/* ===============================================================
             1. QUICK SNIPE
-        ═══════════════════════════════════════════════════════════════ */}
+        =============================================================== */}
         <Card className="relative overflow-hidden">
           {/* Subtle red accent glow */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-[rgba(239,68,68,0.03)] rounded-full blur-3xl pointer-events-none" />
@@ -543,9 +543,9 @@ export default function SniperCenter() {
           </p>
         </Card>
 
-        {/* ═══════════════════════════════════════════════════════════════
+        {/* ===============================================================
             2. ACTIVE POSITIONS
-        ═══════════════════════════════════════════════════════════════ */}
+        =============================================================== */}
         <div>
           <div className="flex items-center gap-2 mb-3">
             <LineChart className="w-4 h-4 text-[#3b82f6]" />
@@ -593,7 +593,7 @@ export default function SniperCenter() {
                             {pos.name}
                           </div>
                           <div className="font-mono text-[10px] text-[#525252]">
-                            {pos.symbol} · {pos.amount} SOL
+                            {pos.symbol} . {pos.amount} SOL
                           </div>
                         </div>
                       </div>
@@ -687,9 +687,9 @@ export default function SniperCenter() {
           </div>
         </div>
 
-        {/* ═══════════════════════════════════════════════════════════════
+        {/* ===============================================================
             3. SNIPER CONFIGURATION
-        ═══════════════════════════════════════════════════════════════ */}
+        =============================================================== */}
         <div>
           <button
             onClick={() => setConfigOpen(!configOpen)}
@@ -885,9 +885,9 @@ export default function SniperCenter() {
           </AnimatePresence>
         </div>
 
-        {/* ═══════════════════════════════════════════════════════════════
+        {/* ===============================================================
             4. SNIPER ANALYTICS
-        ═══════════════════════════════════════════════════════════════ */}
+        =============================================================== */}
         <div>
           <div className="flex items-center gap-2 mb-3">
             <Activity className="w-4 h-4 text-[#06b6d4]" />
@@ -965,9 +965,9 @@ export default function SniperCenter() {
           </div>
         </div>
 
-        {/* ═══════════════════════════════════════════════════════════════
+        {/* ===============================================================
             5. SNIPE HISTORY
-        ═══════════════════════════════════════════════════════════════ */}
+        =============================================================== */}
         <div>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -1054,9 +1054,9 @@ export default function SniperCenter() {
           </Card>
         </div>
 
-        {/* ═══════════════════════════════════════════════════════════════
+        {/* ===============================================================
             6. COPY TRADE
-        ═══════════════════════════════════════════════════════════════ */}
+        =============================================================== */}
         <div>
           <div className="flex items-center gap-2 mb-3">
             <Users className="w-4 h-4 text-[#06b6d4]" />

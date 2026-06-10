@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 
-// ─── Mini Sparkline ───
+// --- Mini Sparkline ---
 // Renders a tiny inline SVG sparkline chart for tables/cards.
 
 interface MiniSparklineProps {
@@ -44,7 +44,7 @@ export function MiniSparkline({
   );
 }
 
-// ─── Quick Sell Buttons ───
+// --- Quick Sell Buttons ---
 
 interface QuickSellButtonsProps {
   symbol: string;

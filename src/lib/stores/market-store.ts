@@ -1,11 +1,11 @@
-// ─── Zustand store for live market data ─────────────────────────────────────
-// Shared across all dashboard pages — fetches once, consumes everywhere.
+// --- Zustand store for live market data -------------------------------------
+// Shared across all dashboard pages -- fetches once, consumes everywhere.
 
 import { create } from "zustand";
 import * as dexscreener from "../api/dexscreener";
 import type { DexPair } from "../api/dexscreener";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 export interface LiveTokenPrice {
   symbol: string;
@@ -45,7 +45,7 @@ interface MarketState {
   refresh: () => Promise<void>;
 }
 
-// ─── Store ────────────────────────────────────────────────────────────────────
+// --- Store --------------------------------------------------------------------
 
 export const useMarketStore = create<MarketState>((set, get) => ({
   tokens: [],
@@ -106,7 +106,7 @@ export const useMarketStore = create<MarketState>((set, get) => ({
   },
 }));
 
-// ─── Auto-refresh (client-side only) ─────────────────────────────────────────
+// --- Auto-refresh (client-side only) -----------------------------------------
 
 let refreshInterval: ReturnType<typeof setInterval> | null = null;
 

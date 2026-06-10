@@ -20,7 +20,7 @@ import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
 import { cn } from "../../lib/utils/cn";
 
-// ─── Types ───
+// --- Types ---
 
 type LeaderboardTab = "traders" | "snipers" | "yield" | "alltime";
 type TimeFilter = "24h" | "7d" | "30d" | "all";
@@ -40,7 +40,7 @@ interface Trader {
   tab: LeaderboardTab[];
 }
 
-// ─── Mock Data ───
+// --- Mock Data ---
 
 const traders: Trader[] = [
   {
@@ -745,7 +745,7 @@ const traders: Trader[] = [
   },
 ];
 
-// ─── Badge Config ───
+// --- Badge Config ---
 
 const badgeConfig: Record<string, { label: string; color: string }> = {
   "🐋": { label: "Whale Hunter", color: "rgba(59,130,246,0.15)" },
@@ -754,7 +754,7 @@ const badgeConfig: Record<string, { label: string; color: string }> = {
   "📈": { label: "Profit King", color: "rgba(16,185,129,0.15)" },
 };
 
-// ─── Tab Config ───
+// --- Tab Config ---
 
 const tabs: { key: LeaderboardTab; label: string; icon: React.ReactNode }[] = [
   { key: "traders", label: "Traders", icon: <BarChart3 className="w-3.5 h-3.5" /> },
@@ -770,7 +770,7 @@ const timeFilters: { key: TimeFilter; label: string }[] = [
   { key: "all", label: "All Time" },
 ];
 
-// ─── Helper Components ───
+// --- Helper Components ---
 
 function AvatarPlaceholder({ name, size = "md" }: { name: string; size?: "sm" | "md" | "lg" }) {
   const sizeClasses = {
@@ -903,7 +903,7 @@ function PodiumCard({ trader, position }: { trader: Trader; position: 1 | 2 | 3 
   );
 }
 
-// ─── Main Component ───
+// --- Main Component ---
 
 export default function LeaderboardPage() {
   const [activeTab, setActiveTab] = useState<LeaderboardTab>("traders");
@@ -965,7 +965,7 @@ export default function LeaderboardPage() {
 
   return (
       <div className="p-3 space-y-3">
-        {/* ── Header ── */}
+        {/* -- Header -- */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-[rgba(0,255,65,0.1)] flex items-center justify-center">
@@ -991,7 +991,7 @@ export default function LeaderboardPage() {
           </button>
         </div>
 
-        {/* ── Tabs + Time Filter + Search ── */}
+        {/* -- Tabs + Time Filter + Search -- */}
         <div className="flex flex-col sm:flex-row gap-3">
           {/* Tabs */}
           <div className="flex gap-1 bg-[#0a0a0b] rounded-lg p-1 border border-[rgba(255,255,255,0.06)]">
@@ -1043,7 +1043,7 @@ export default function LeaderboardPage() {
           </div>
         </div>
 
-        {/* ── Your Rank Card (Prominent) ── */}
+        {/* -- Your Rank Card (Prominent) -- */}
         {yourRank && (
           <Card className="border-[rgba(59,130,246,0.2)] bg-[rgba(59,130,246,0.03)]">
             <div className="flex items-center gap-2 mb-2">
@@ -1114,7 +1114,7 @@ export default function LeaderboardPage() {
           </Card>
         )}
 
-        {/* ── Top 3 Podium ── */}
+        {/* -- Top 3 Podium -- */}
         {top3.length >= 3 && (
           <div className="grid grid-cols-3 gap-3">
             {/* 2nd place - left */}
@@ -1132,7 +1132,7 @@ export default function LeaderboardPage() {
           </div>
         )}
 
-        {/* ── Rankings Table ── */}
+        {/* -- Rankings Table -- */}
         <Card>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -1192,7 +1192,7 @@ export default function LeaderboardPage() {
           </div>
         </Card>
 
-        {/* ── Achievement Badges Legend ── */}
+        {/* -- Achievement Badges Legend -- */}
         <Card>
           <div className="flex items-center gap-2 mb-3">
             <Award className="w-3.5 h-3.5 text-[#eab308]" />
@@ -1226,7 +1226,7 @@ export default function LeaderboardPage() {
   );
 }
 
-// ─── Trader Row Component ───
+// --- Trader Row Component ---
 
 function TraderRow({ trader }: { trader: Trader }) {
   const isTop3 = trader.rank <= 3;

@@ -32,13 +32,14 @@ import {
   SMART_MONEY_FEEDS,
 } from "@/lib/utils/constants";
 import "@/styles/terminal.css";
+import "@/landing/sections.css";
 
-// ─── Navigation helper ───
+// --- Navigation helper ---
 function navTo(route: string) {
   window.location.hash = route;
 }
 
-// ─── Section wrapper ───
+// --- Section wrapper ---
 function Section({
   children,
   className = "",
@@ -64,7 +65,7 @@ function Section({
   );
 }
 
-// ─── Live Ticker Bar ───
+// --- Live Ticker Bar ---
 function LiveTicker() {
   const items = [
     { token: "SOL", price: "$178.24", change: "+3.42%", up: true },
@@ -106,7 +107,7 @@ function LiveTicker() {
   );
 }
 
-// ─── Navbar ───
+// --- Navbar ---
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
@@ -178,7 +179,7 @@ function Navbar() {
   );
 }
 
-// ─── Hero ───
+// --- Hero ---
 function Hero() {
 
   return (
@@ -206,7 +207,7 @@ function Hero() {
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-[rgba(0,255,65,0.03)] blur-[150px]" />
 
       <div className="relative max-w-7xl mx-auto px-6 w-full">
-        {/* Alpha Score Bar — Bloomberg style */}
+        {/* Alpha Score Bar -- Bloomberg style */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -257,7 +258,7 @@ function Hero() {
         </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          {/* Left: Copy — Massive hierarchy */}
+          {/* Left: Copy -- Massive hierarchy */}
           <div>
             <motion.div
               initial={{ opacity: 0 }}
@@ -266,7 +267,7 @@ function Hero() {
               className="mb-4"
             >
               <Badge variant="success" size="sm">
-                v{COMPO.version} — MARKET WARFARE TERMINAL
+                v{COMPO.version} -- MARKET WARFARE TERMINAL
               </Badge>
             </motion.div>
 
@@ -363,7 +364,7 @@ function Hero() {
             </motion.div>
           </div>
 
-          {/* Right: Live Terminal — ALIVE */}
+          {/* Right: Live Terminal -- ALIVE */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -376,7 +377,7 @@ function Hero() {
                 <div className="terminal-dot bg-[#f59e0b]" />
                 <div className="terminal-dot bg-[#10b981]" />
                 <span className="ml-2 text-[10px] font-mono text-[#525252]">
-                  compo@live:~ — market feed
+                  compo@live:~ -- market feed
                 </span>
               </div>
               <div className="p-4 space-y-3 min-h-[280px]">
@@ -409,7 +410,7 @@ function Hero() {
   );
 }
 
-// ─── Live Whale Feed ───
+// --- Live Whale Feed ---
 function LiveWhaleFeed() {
   const [feeds, setFeeds] = useState(WHALE_FEEDS.slice(0, 5));
 
@@ -436,7 +437,7 @@ function LiveWhaleFeed() {
           Live Feed
         </span>
         <span className="font-mono text-[10px] text-[#525252]">
-          — Whale Movements
+          -- Whale Movements
         </span>
       </div>
       <AnimatePresence initial={false}>
@@ -476,7 +477,7 @@ function LiveWhaleFeed() {
   );
 }
 
-// ─── Smart Money Section ───
+// --- Smart Money Section ---
 function SmartMoneySection() {
   return (
     <Section id="smart-money" className="py-16 px-6">
@@ -600,7 +601,7 @@ function SmartMoneySection() {
                       key={i}
                       className="aspect-[2/1] rounded-[1px]"
                       style={{ background: bg }}
-                      title={`${Math.floor(i / 4)}:00 — ${Math.round(intensity * 100)}% activity`}
+                      title={`${Math.floor(i / 4)}:00 -- ${Math.round(intensity * 100)}% activity`}
                     />
                   );
                 })}
@@ -618,7 +619,7 @@ function SmartMoneySection() {
   );
 }
 
-// ─── Terminal Preview ───
+// --- Terminal Preview ---
 function TerminalPreview() {
   const [active, setActive] = useState(0);
   const [executed, setExecuted] = useState(false);
@@ -799,7 +800,7 @@ function TerminalPreview() {
   );
 }
 
-// ─── Features — Terminal Operational Style ───
+// --- Features -- Terminal Operational Style ---
 const features = [
   {
     icon: <Shield className="w-5 h-5" />,
@@ -950,7 +951,7 @@ function Features() {
   );
 }
 
-// ─── How It Works ───
+// --- How It Works ---
 function HowItWorks() {
   const steps = [
     {
@@ -1026,7 +1027,7 @@ function HowItWorks() {
   );
 }
 
-// ─── Social Proof ───
+// --- Social Proof ---
 function SocialProof() {
   const alerts = [
     {
@@ -1132,7 +1133,7 @@ function SocialProof() {
                       {(a.amount || a.movement || a.reason || a.event) && (
                         <span className="text-[#71717a]">
                           {" "}
-                          —{" "}
+                          --{" "}
                           {a.amount ?? a.movement ?? a.reason ?? a.event}
                         </span>
                       )}
@@ -1177,7 +1178,7 @@ function SocialProof() {
   );
 }
 
-// ─── CTA Section ───
+// --- CTA Section ---
 function CTASection() {
   return (
     <section className="py-20 px-6 relative">
@@ -1211,14 +1212,14 @@ function CTASection() {
           </Button>
         </div>
         <p className="font-mono text-[10px] text-[#333] mt-4">
-          v{COMPO.version} — Solana Mainnet — No API key required for demo
+          v{COMPO.version} -- Solana Mainnet -- No API key required for demo
         </p>
       </div>
     </section>
   );
 }
 
-// ─── Footer ───
+// --- Footer ---
 function Footer() {
   return (
     <footer className="border-t border-[rgba(255,255,255,0.04)] py-8 px-6">
@@ -1299,7 +1300,7 @@ function Footer() {
 
         <div className="border-t border-[rgba(255,255,255,0.03)] pt-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="font-mono text-[9px] text-[#333]">
-            (c) 2026 COMPO — Market Warfare Terminal
+            (c) 2026 COMPO -- Market Warfare Terminal
           </p>
           <div className="flex items-center gap-3">
             {[
@@ -1323,19 +1324,79 @@ function Footer() {
   );
 }
 
-// ─── Main Landing Page ───
+// --- Live Alerts Section ---
+function LiveAlerts() {
+  const alerts = [
+    { id: 1, arrow: '↗', token: '$BONK', event: 'Whale Buy', amount: '42.5 SOL', time: '2m ago', isBuy: true },
+    { id: 2, arrow: '↘', token: '$WIF', event: 'LP Pulled', amount: '847 SOL', time: '8m ago', isBuy: false },
+    { id: 3, arrow: '↘', token: '$POPCAT', event: 'Whale Sell', amount: '120 SOL', time: '14m ago', isBuy: false },
+    { id: 4, arrow: '↗', token: '$PYTH', event: 'New Listing', amount: 'Raydium', time: '22m ago', isBuy: true },
+    { id: 5, arrow: '🔴', token: '$MOODENG', event: 'Honeypot Alert', amount: ' -- ', time: '31m ago', isHoneypot: true },
+  ];
+
+  return (
+    <section className="landing-alerts px-6 py-8">
+      <div className="section-header inline-flex items-center gap-2 mb-6">
+        <div className="live-dot w-1.5 h-1.5 rounded-full bg-[#00ff41] animate-pulse"></div>
+        <span className="font-mono text-[11px] text-[#6b7280] uppercase tracking-wider">ACTIVE ALERTS</span>
+        <span className="bg-[rgba(239,68,68,0.12)] text-[#ef4444] font-mono text-[10px] px-2 py-0.5 rounded">3 HOT</span>
+      </div>
+      <div className="alert-list">
+        {alerts.map((a) => (
+          <div key={a.id} className="alert-item grid grid-cols-[20px_1fr_1fr_100px_60px] gap-4 px-2 py-3 border-b border-[#111111] font-mono text-[13px] items-center hover:bg-[rgba(255,255,255,0.02)]">
+            <span className={`alert-arrow text-[16px] ${a.isBuy ? 'text-[#00ff41]' : ''} ${a.isHoneypot ? 'text-[#ef4444]' : ''}`}>{a.arrow}</span>
+            <span className="alert-token font-semibold text-white">{a.token}</span>
+            <span className="alert-event text-[11px] text-[#6b7280]">{a.event}</span>
+            <span className="alert-amount text-[12px] text-[#9ca3af]">{a.amount}</span>
+            <span className="alert-time text-[11px] text-[#4b5563]">{a.time}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// --- Modules Section ---
+function Modules() {
+  const modules = [
+    { id: '1', eyebrow: 'TOKEN_SCANNER', title: 'Scanner', desc: '12-point contract analysis. Honeypot detection. Liquidity verification.', tags: ['RISK SCORE', 'HONEYPOT', 'LP AUDIT'] },
+    { id: '2', eyebrow: 'WHALE_RADAR', title: 'Whale Radar', desc: 'Real-time whale transaction tracking. Smart Money flow detection.', tags: ['REAL-TIME', 'WALLET LABELS', 'ALERTS'] },
+    { id: '3', eyebrow: 'SNIPER_ENGINE', title: 'Sniper', desc: 'Fast DEX execution. MEV-resistant. One-click buy/sell.', tags: ['QUICK SNIPING', 'RAYDIUM', 'JUPITER'] },
+    { id: '4', eyebrow: 'PORTFOLIO_INTEL', title: 'Portfolio', desc: 'Wallet tracking. P&L calculation. Risk exposure monitoring.', tags: ['P&L', 'RISK SCORE', 'ALERTS'] },
+    { id: '5', eyebrow: 'ALERT_SYSTEM', title: 'Alerts', desc: 'Price triggers. Volume spikes. Contract warnings.', tags: ['PRICE', 'VOLUME', 'CONTRACT'] },
+    { id: '6', eyebrow: 'LEADERBOARD', title: 'Leaderboard', desc: 'Ranked traders. Performance tracking. Alpha attribution.', tags: ['TRADERS', 'P&L', 'VERIFIED'] },
+  ];
+
+  return (
+    <section className="modules-section px-6 py-8">
+      <div className="section-header inline-flex items-center gap-2 mb-6 font-mono text-[11px] uppercase tracking-wider text-[#6b7280]">TERMINAL MODULES</div>
+      <div className="modules-grid grid grid-cols-2 gap-4">
+        {modules.map((m) => (
+          <div key={m.id} className="module-card bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6 transition-all duration-200 hover:border-[#00ff41] hover:shadow-[0_0_20px_rgba(0,255,65,0.06)] cursor-pointer">
+            <div className="module-eyebrow font-mono text-[10px] text-[#00ff41] uppercase mb-2">{m.eyebrow}</div>
+            <div className="module-title font-mono text-[16px] font-semibold text-white mb-2">{m.title}</div>
+            <div className="module-desc font-sans text-[13px] text-[#6b7280] line-height-[1.5] mb-3">{m.desc}</div>
+            <div className="module-tags flex gap-2">
+              {m.tags.map((t) => (
+                <span key={t} className="module-tag border border-[#1a1a1a] text-[#4b5563] font-mono text-[10px] px-2 py-0.5 rounded">{t}</span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// --- Main Landing Page ---
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#030303] text-[#e4e4e7] overflow-x-hidden">
+    <div className="min-h-screen bg-[#000000] text-white overflow-x-hidden">
       <Navbar />
       <LiveTicker />
       <Hero />
-      <SmartMoneySection />
-      <TerminalPreview />
-      <Features />
-      <HowItWorks />
-      <SocialProof />
-      <CTASection />
+      <LiveAlerts />
+      <Modules />
       <Footer />
     </div>
   );

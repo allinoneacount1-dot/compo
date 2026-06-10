@@ -1,4 +1,4 @@
-// ─── Re-export from API client ─────────────────────────────────────────────────
+// --- Re-export from API client -------------------------------------------------
 // This file exists so existing imports from "../hooks/dexscreener" keep working.
 // The real implementation is in "../api/dexscreener".
 

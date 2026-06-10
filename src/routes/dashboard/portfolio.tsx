@@ -21,7 +21,7 @@ import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
 import { formatPriceDetailed, formatPercent, downloadCSV } from "../../lib/utils/format";
 
-// ─── Types ───
+// --- Types ---
 
 type TokenCategory = "all" | "bluechips" | "memecoins" | "stablecoins";
 type SortField = "token" | "price" | "change" | "value" | "pnl" | "allocation";
@@ -55,7 +55,7 @@ interface DayPerformance {
   value: number;
 }
 
-// ─── Mock Data ───
+// --- Mock Data ---
 
 const HOLDINGS: Holding[] = [
   {
@@ -238,7 +238,7 @@ const WEEKLY_PERFORMANCE: DayPerformance[] = [
   { day: "Sun", value: 150045 },
 ];
 
-// ─── Animated Counter Hook (no framer-motion) ───
+// --- Animated Counter Hook (no framer-motion) ---
 
 function useAnimatedValue(target: number, duration = 1200) {
   const [current, setCurrent] = useState(0);
@@ -270,7 +270,7 @@ function useAnimatedValue(target: number, duration = 1200) {
   return current;
 }
 
-// ─── CountUp Component ───
+// --- CountUp Component ---
 
 function AnimatedCounter({
   value,
@@ -298,7 +298,7 @@ function AnimatedCounter({
   );
 }
 
-// ─── Donut Chart Component ───
+// --- Donut Chart Component ---
 
 function DonutChart({ holdings }: { holdings: Holding[] }) {
   // Filter out negligible holdings for the chart
@@ -373,7 +373,7 @@ function DonutChart({ holdings }: { holdings: Holding[] }) {
   );
 }
 
-// ─── Performance Bar Chart ───
+// --- Performance Bar Chart ---
 
 function PerformanceChart({ data }: { data: DayPerformance[] }) {
   const maxVal = Math.max(...data.map((d) => d.value));
@@ -419,7 +419,7 @@ function PerformanceChart({ data }: { data: DayPerformance[] }) {
   );
 }
 
-// ─── Main Component ───
+// --- Main Component ---
 
 export default function PortfolioPage() {
   const [filter, setFilter] = useState<TokenCategory>("all");
@@ -558,7 +558,7 @@ export default function PortfolioPage() {
 
   return (
       <div className="p-4 space-y-4 max-w-[1400px]">
-        {/* ── Header ── */}
+        {/* -- Header -- */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded bg-[rgba(0,255,65,0.12)] flex items-center justify-center">
@@ -600,7 +600,7 @@ export default function PortfolioPage() {
           </div>
         </div>
 
-        {/* ── Settings Panel ── */}
+        {/* -- Settings Panel -- */}
         {showSettings && (
           <Card className="border-[rgba(0,255,65,0.15)] bg-[rgba(0,255,65,0.03)]">
             <div className="flex items-center gap-2 mb-3">
@@ -654,7 +654,7 @@ export default function PortfolioPage() {
           </Card>
         )}
 
-        {/* ── Summary Cards ── */}
+        {/* -- Summary Cards -- */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {/* Total Value */}
           <Card>
@@ -780,7 +780,7 @@ export default function PortfolioPage() {
           </Card>
         </div>
 
-        {/* ── Allocation + Performance Row ── */}
+        {/* -- Allocation + Performance Row -- */}
         <div className="grid lg:grid-cols-[340px_1fr] gap-3">
           {/* Allocation Donut */}
           <Card>
@@ -829,14 +829,14 @@ export default function PortfolioPage() {
               </span>
               <span className="font-mono text-[10px] text-[#71717a]">
                 {(Math.min(...WEEKLY_PERFORMANCE.map((d) => d.value)) / 1000).toFixed(1)}k
-                {" — "}
+                {" -- "}
                 {(Math.max(...WEEKLY_PERFORMANCE.map((d) => d.value)) / 1000).toFixed(1)}k
               </span>
             </div>
           </Card>
         </div>
 
-        {/* ── Holdings Table ── */}
+        {/* -- Holdings Table -- */}
         <Card>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -1052,7 +1052,7 @@ export default function PortfolioPage() {
           </div>
         </Card>
 
-        {/* ── Recent Activity ── */}
+        {/* -- Recent Activity -- */}
         <Card>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -1125,7 +1125,7 @@ export default function PortfolioPage() {
           </div>
         </Card>
 
-        {/* ── Footer Status Bar ── */}
+        {/* -- Footer Status Bar -- */}
         <div className="flex items-center justify-between px-1">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">

@@ -1,11 +1,11 @@
-// ─── DexScreener React Hooks ──────────────────────────────────────────────────
+// --- DexScreener React Hooks --------------------------------------------------
 // Custom hooks for fetching DexScreener data with polling + caching.
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import * as dexscreener from "./dexscreener";
 import type { DexPair, TrendingMeta } from "./dexscreener";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 export interface TokenPrice {
   symbol: string;
@@ -25,7 +25,7 @@ export interface NetworkHealth {
   isHealthy: boolean;
 }
 
-// ─── Polling Hook ─────────────────────────────────────────────────────────────
+// --- Polling Hook -------------------------------------------------------------
 
 interface UsePollOptions {
   intervalMs?: number;
@@ -64,8 +64,8 @@ function usePoll<T>(
   return { data, loading, error, refetch: fetch };
 }
 
-// ─── Known Token Prices (watchlist) ──────────────────────────────────────────
-// Polls every 30s — DexScreener rate limit is 300 req/min so ~20 tokens every 30s is fine.
+// --- Known Token Prices (watchlist) ------------------------------------------
+// Polls every 30s -- DexScreener rate limit is 300 req/min so ~20 tokens every 30s is fine.
 
 export function useKnownTokenPrices() {
   const fetcher = useCallback(async (): Promise<TokenPrice[]> => {
@@ -75,7 +75,7 @@ export function useKnownTokenPrices() {
   return usePoll<TokenPrice[]>(fetcher, { intervalMs: 30_000 });
 }
 
-// ─── Search Pairs ─────────────────────────────────────────────────────────────
+// --- Search Pairs -------------------------------------------------------------
 
 export function useSearchPairs(query: string) {
   const fetcher = useCallback(async (): Promise<DexPair[]> => {
@@ -88,7 +88,7 @@ export function useSearchPairs(query: string) {
   // Note: query-based search only runs via refetch, not auto-poll
 }
 
-// ─── Trending Metas ───────────────────────────────────────────────────────────
+// --- Trending Metas -----------------------------------------------------------
 
 export function useTrendingMetas() {
   const fetcher = useCallback(async (): Promise<TrendingMeta[]> => {
@@ -98,17 +98,17 @@ export function useTrendingMetas() {
   return usePoll<TrendingMeta[]>(fetcher, { intervalMs: 120_000 });
 }
 
-// ─── Latest Profiles ──────────────────────────────────────────────────────────
+// --- Latest Profiles ----------------------------------------------------------
 
 export function useLatestProfiles() {
   const fetcher = useCallback(async () => {
     return dexscreener.getLatestProfiles();
   }, []);
 
-  return usePoll(fetcher, { intervalMs: 300_000 }); // 5 min — rate limit 60/min
+  return usePoll(fetcher, { intervalMs: 300_000 }); // 5 min -- rate limit 60/min
 }
 
-// ─── Token-Specific Pairs ────────────────────────────────────────────────────
+// --- Token-Specific Pairs ----------------------------------------------------
 
 export function useTokenPairs(tokenAddress: string) {
   const fetcher = useCallback(async (): Promise<DexPair[]> => {
@@ -119,7 +119,7 @@ export function useTokenPairs(tokenAddress: string) {
   return usePoll<DexPair[]>(fetcher, { intervalMs: 30_000 });
 }
 
-// ─── Helius Network Health ───────────────────────────────────────────────────
+// --- Helius Network Health ---------------------------------------------------
 // Uses Helius API for real Solana network data (slot, latency).
 
 export function useNetworkHealth() {
@@ -136,7 +136,7 @@ export function useNetworkHealth() {
 
       return {
         slot,
-        latencyMs: 42, // Approximate — Helius doesn't give real latency
+        latencyMs: 42, // Approximate -- Helius doesn't give real latency
         tps: 0,       // Would need dedicated TPS endpoint
         isHealthy: txns.length > 0,
       };
@@ -156,7 +156,7 @@ export function useNetworkHealth() {
   return usePoll<NetworkHealth>(fetcher, { intervalMs: 30_000 });
 }
 
-// ─── Whale Movements (from pair txns) ────────────────────────────────────────
+// --- Whale Movements (from pair txns) ----------------------------------------
 // Derives whale movements from high-volume pairs.
 
 export interface WhaleMovement {

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-/* ─── Context for column configuration ─── */
+/* --- Context for column configuration --- */
 
 interface TableContextValue {
   columns: string[];
@@ -14,7 +14,7 @@ const TableContext = createContext<TableContextValue>({
   dense: false,
 });
 
-/* ─── Table ─── */
+/* --- Table --- */
 
 interface TableProps {
   children: ReactNode;
@@ -32,7 +32,7 @@ export function Table({ children, columns, dense = false, className = "" }: Tabl
   );
 }
 
-/* ─── TableHeader ─── */
+/* --- TableHeader --- */
 
 interface TableHeaderProps {
   children: ReactNode;
@@ -58,7 +58,7 @@ export function TableHeader({ children, className = "" }: TableHeaderProps) {
   );
 }
 
-/* ─── TableRow ─── */
+/* --- TableRow --- */
 
 interface TableRowProps {
   children: ReactNode;
@@ -88,7 +88,7 @@ export function TableRow({ children, onClick, className = "" }: TableRowProps) {
   );
 }
 
-/* ─── TableCell ─── */
+/* --- TableCell --- */
 
 interface TableCellProps {
   children: ReactNode;

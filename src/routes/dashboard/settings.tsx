@@ -33,7 +33,7 @@ import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 import { cn } from "../../lib/utils/cn";
 
-// ─── Types ───
+// --- Types ---
 
 type SettingsTab =
   | "general"
@@ -100,7 +100,7 @@ interface AdvancedSettings {
   dbLastBackup: string;
 }
 
-// ─── Constants ───
+// --- Constants ---
 
 const TABS: { key: SettingsTab; label: string; icon: typeof Settings }[] = [
   { key: "general", label: "General", icon: Settings },
@@ -185,7 +185,7 @@ const WALLET_TYPES = [
   { value: "walletconnect", label: "WalletConnect", icon: "🔗" },
 ];
 
-// ─── Toggle Component ───
+// --- Toggle Component ---
 
 function Toggle({
   enabled,
@@ -211,7 +211,7 @@ function Toggle({
   );
 }
 
-// ─── Section Header ───
+// --- Section Header ---
 
 function SectionHeader({
   title,
@@ -234,7 +234,7 @@ function SectionHeader({
   );
 }
 
-// ─── Form Row ───
+// --- Form Row ---
 
 function FormRow({
   label,
@@ -251,7 +251,7 @@ function FormRow({
   );
 }
 
-// ─── Confirmation Modal ───
+// --- Confirmation Modal ---
 
 function ConfirmModal({
   open,
@@ -319,7 +319,7 @@ function ConfirmModal({
   );
 }
 
-// ─── Add Wallet Modal ───
+// --- Add Wallet Modal ---
 
 function AddWalletModal({
   open,
@@ -370,7 +370,7 @@ function AddWalletModal({
   );
 }
 
-// ─── Main Component ───
+// --- Main Component ---
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<SettingsTab>("general");
@@ -459,7 +459,7 @@ export default function SettingsPage() {
     dbLastBackup: "2026-06-10 03:00 UTC",
   });
 
-  // ─── Save handler ───
+  // --- Save handler ---
 
   const handleSave = useCallback(() => {
     setSaveStatus("saving");
@@ -469,7 +469,7 @@ export default function SettingsPage() {
     }, 600);
   }, []);
 
-  // ─── Confirm modal helpers ───
+  // --- Confirm modal helpers ---
 
   const openConfirmModal = useCallback(
     (opts: {
@@ -488,7 +488,7 @@ export default function SettingsPage() {
     setConfirmModal((prev) => ({ ...prev, open: false }));
   }, []);
 
-  // ─── Wallet handlers ───
+  // --- Wallet handlers ---
 
   const handleAddWallet = useCallback((type: string, name: string) => {
     const newWallet = {
@@ -510,7 +510,7 @@ export default function SettingsPage() {
     }));
   }, []);
 
-  // ─── API test handler ───
+  // --- API test handler ---
 
   const handleTestConnection = useCallback(() => {
     setApi((prev) => ({ ...prev, connectionStatus: "testing" }));
@@ -523,7 +523,7 @@ export default function SettingsPage() {
     }, 1500);
   }, []);
 
-  // ─── Test notification handlers ───
+  // --- Test notification handlers ---
 
   const handleTestTelegram = useCallback(() => {
     alert("Test notification sent to Telegram!");
@@ -533,7 +533,7 @@ export default function SettingsPage() {
     alert("Test notification sent to Discord!");
   }, []);
 
-  // ─── Danger actions ───
+  // --- Danger actions ---
 
   const handleResetAll = useCallback(() => {
     openConfirmModal({
@@ -625,7 +625,7 @@ export default function SettingsPage() {
     });
   }, [openConfirmModal, closeConfirmModal, handleSave]);
 
-  // ─── Render Save Button ───
+  // --- Render Save Button ---
 
   const renderSaveButton = () => (
     <div className="flex items-center justify-between pt-4 mt-4 border-t border-[rgba(255,255,255,0.06)]">
@@ -654,7 +654,7 @@ export default function SettingsPage() {
     </div>
   );
 
-  // ─── Panel Renderers ───
+  // --- Panel Renderers ---
 
   const renderGeneralPanel = () => (
     <div className="space-y-6">
@@ -1453,7 +1453,7 @@ export default function SettingsPage() {
       <Card className="border-[rgba(239,68,68,0.2)]">
         <SectionHeader
           title="Danger Zone"
-          description="Irreversible actions — proceed with caution"
+          description="Irreversible actions -- proceed with caution"
         />
 
         <div className="flex items-center justify-between pt-1">
@@ -1595,7 +1595,7 @@ export default function SettingsPage() {
     </div>
   );
 
-  // ─── Panel Router ───
+  // --- Panel Router ---
 
   const renderPanel = () => {
     switch (activeTab) {
@@ -1621,7 +1621,7 @@ export default function SettingsPage() {
   return (
     <>
     <div className="p-4 max-w-[1280px]">
-        {/* ── Page Header ── */}
+        {/* -- Page Header -- */}
         <div className="flex items-center gap-3 mb-6">
           <div className="w-9 h-9 rounded bg-[rgba(0,255,65,0.1)] flex items-center justify-center">
             <Settings className="w-5 h-5 text-[#00ff41]" />
@@ -1636,7 +1636,7 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* ── Main Layout: Sidebar + Content ── */}
+        {/* -- Main Layout: Sidebar + Content -- */}
         <div className="flex gap-4">
           {/* Left Sidebar Navigation */}
           <div className="w-[200px] flex-shrink-0">
@@ -1672,7 +1672,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* ── Confirmation Modal ── */}
+      {/* -- Confirmation Modal -- */}
       <ConfirmModal
         open={confirmModal.open}
         title={confirmModal.title}
@@ -1683,7 +1683,7 @@ export default function SettingsPage() {
         onCancel={closeConfirmModal}
       />
 
-      {/* ── Add Wallet Modal ── */}
+      {/* -- Add Wallet Modal -- */}
       <AddWalletModal
         open={addWalletModalOpen}
         onAdd={handleAddWallet}

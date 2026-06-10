@@ -47,7 +47,7 @@ body {
   color: white;
 }
 
-/* ── Mobile overflow protection ── */
+/* -- Mobile overflow protection -- */
 @media (max-width: 767px) {
   /* Prevent horizontal overflow on mobile */
   body {
