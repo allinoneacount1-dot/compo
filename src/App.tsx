@@ -21,9 +21,7 @@ function App() {
       else if (hash.startsWith("/whales")) setPage("whales");
       else if (hash.startsWith("/sniper")) setPage("sniper");
       else if (hash.startsWith("/dashboard")) setPage("dashboard");
-      else if (hash === "/landing" || hash === "/" || hash === "") {
-        // stay on current or default
-      }
+      else setPage("landing");
     };
     handleHash();
     window.addEventListener("hashchange", handleHash);
