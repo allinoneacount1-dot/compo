@@ -83,7 +83,7 @@ function LiveTicker() {
         {[...items, ...items].map((item, i) => (
           <div
             key={i}
-            className="flex items-center gap-2 px-4 py-1.5 shrink-0"
+            className="flex items-center gap-3 px-6 py-2 shrink-0"
           >
             <span className="font-mono text-[11px] text-[#71717a] font-medium">
               {item.token}
@@ -93,12 +93,12 @@ function LiveTicker() {
             </span>
             <span
               className={`font-mono text-[10px] ${
-                item.up ? "text-[#10b981]" : "text-[#ef4444]"
+                item.up ? "text-[#00FF9F]" : "text-[#FF3B5C]"
               }`}
             >
               {item.change}
             </span>
-            <span className="text-[#333] mx-1">|</span>
+            <span className="text-[#222] mx-2">|</span>
           </div>
         ))}
       </div>
@@ -124,10 +124,11 @@ function Navbar() {
           : "bg-transparent",
       ].join(" ")}
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-between h-12 px-6">
+      <div className="max-w-7xl mx-auto flex items-center justify-between h-14 px-6">
+        {/* Left: Logo */}
         <button
           onClick={() => navTo("#/landing")}
-          className="flex items-center gap-2 cursor-pointer"
+          className="flex items-center gap-2 cursor-pointer shrink-0"
         >
           <Terminal className="w-4 h-4 text-[#00ff41]" />
           <span className="font-mono font-bold text-[#00ff41] text-sm tracking-[0.15em]">
@@ -138,7 +139,8 @@ function Navbar() {
           </span>
         </button>
 
-        <div className="hidden md:flex items-center gap-6">
+        {/* Center: Nav tabs (desktop only) */}
+        <div className="hidden lg:flex items-center gap-8">
           {[
             { label: "SCANNER", route: "#/scanner" },
             { label: "WHALES", route: "#/whales" },
@@ -155,7 +157,8 @@ function Navbar() {
           ))}
         </div>
 
-        <div className="flex items-center gap-3">
+        {/* Right: CTA */}
+        <div className="flex items-center gap-3 shrink-0">
           <div className="hidden sm:flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse" />
             <span className="font-mono text-[10px] text-[#525252]">
