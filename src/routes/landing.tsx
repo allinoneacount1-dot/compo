@@ -10,6 +10,11 @@ import { CountUp } from "@/components/ui/CountUp";
 import { TERMINAL_MESSAGES, COMPO } from "@/lib/utils/constants";
 import "@/styles/terminal.css";
 
+// ─── Navigation helper ───
+function navTo(route: string) {
+  window.location.hash = route;
+}
+
 // ─── Section wrapper with scroll animation ───
 function Section({ children, className = "", id }: { children: React.ReactNode; className?: string; id?: string }) {
   const ref = useRef(null);
@@ -45,16 +50,25 @@ function Navbar() {
       ].join(" ")}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between h-14 px-6">
-        <a href="#top" className="flex items-center gap-2">
+        <button onClick={() => navTo("#/landing")} className="flex items-center gap-2 cursor-pointer">
           <Terminal className="w-4 h-4 text-[#00ff41]" />
           <span className="font-mono font-bold text-[#00ff41] text-lg tracking-tight">COMPO</span>
-        </a>
+        </button>
 
         <div className="hidden md:flex items-center gap-8">
-          {["Scanner", "Whale Radar", "Sniper", "Terminal"].map((link) => (
-            <a key={link} href={`#${link.toLowerCase().replace(" ", "-")}`} className="font-mono text-sm text-[#71717a] hover:text-[#e4e4e7] transition-colors">
-              [{link}]
-            </a>
+          {[
+            { label: "Scanner", route: "#/scanner" },
+            { label: "Whale Radar", route: "#/whales" },
+            { label: "Sniper", route: "#/sniper" },
+            { label: "Terminal", route: "#/dashboard" },
+          ].map((link) => (
+            <button
+              key={link.label}
+              onClick={() => navTo(link.route)}
+              className="font-mono text-sm text-[#71717a] hover:text-[#e4e4e7] transition-colors cursor-pointer"
+            >
+              [{link.label}]
+            </button>
           ))}
         </div>
 
@@ -63,7 +77,7 @@ function Navbar() {
             <span className="w-2 h-2 rounded-full bg-[#10b981] terminal-glow" />
             <span className="font-mono text-xs text-[#71717a]">SOLANA ● LIVE</span>
           </div>
-          <Button variant="secondary" size="sm">
+          <Button variant="secondary" size="sm" onClick={() => alert("Wallet connect modal — coming soon!")}>
             Connect Wallet
           </Button>
         </div>
@@ -149,10 +163,10 @@ function Hero() {
               transition={{ delay: 0.55, duration: 0.5 }}
               className="flex flex-wrap gap-3"
             >
-              <Button size="lg" icon={<ArrowRight className="w-4 h-4" />}>
+              <Button size="lg" icon={<ArrowRight className="w-4 h-4" />} onClick={() => navTo("#/dashboard")}>
                 LAUNCH TERMINAL
               </Button>
-              <Button variant="ghost" size="lg">
+              <Button variant="ghost" size="lg" onClick={() => navTo("#/docs")}>
                 READ DOCS
               </Button>
             </motion.div>
@@ -298,7 +312,7 @@ function TerminalPreview() {
                   key={c.label}
                   onClick={() => runCommand(i)}
                   className={[
-                    "font-mono text-xs px-3 py-1.5 rounded transition-all",
+                    "font-mono text-xs px-3 py-1.5 rounded transition-all cursor-pointer",
                     active === i && executed
                       ? "bg-[rgba(0,255,65,0.15)] text-[#00ff41] border border-[rgba(0,255,65,0.3)]"
                       : "bg-[rgba(255,255,255,0.04)] text-[#71717a] border border-[rgba(255,255,255,0.08)] hover:text-[#e4e4e7] hover:border-[rgba(255,255,255,0.15)]",
@@ -325,6 +339,13 @@ function TerminalPreview() {
             </AnimatePresence>
           </div>
         </div>
+
+        {/* Launch button below terminal */}
+        <div className="text-center mt-8">
+          <Button size="lg" icon={<ArrowRight className="w-4 h-4" />} onClick={() => navTo("#/dashboard")}>
+            LAUNCH TERMINAL →
+          </Button>
+        </div>
       </div>
     </Section>
   );
@@ -338,6 +359,7 @@ const features = [
     title: "Token Scanner",
     desc: "12-point contract audit. Honeypot detection. LP lock verification. Holder concentration analysis. Every token scored in seconds.",
     tags: ["Risk Score", "Honeypot", "LP Audit", "Mint Authority"],
+    route: "#/scanner",
   },
   {
     icon: <Eye className="w-5 h-5" />,
@@ -345,6 +367,7 @@ const features = [
     title: "Whale Radar",
     desc: "Real-time tracking of 500+ verified whale wallets. Movement alerts within 2 blocks. Full wallet profitability profiling.",
     tags: ["Live Tracking", "500+ Wallets", "2-Block Alerts", "Profiling"],
+    route: "#/whales",
   },
   {
     icon: <Zap className="w-5 h-5" />,
@@ -352,6 +375,7 @@ const features = [
     title: "Sniper Engine",
     desc: "Sub-second execution across Jupiter & Raydium. Auto TP/SL. Anti-rug protection. Optional copy-trade mirroring.",
     tags: ["< 1s Execution", "Auto TP/SL", "Anti-Rug", "Copy Trade"],
+    route: "#/sniper",
   },
   {
     icon: <BarChart3 className="w-5 h-5" />,
@@ -359,6 +383,7 @@ const features = [
     title: "Portfolio Intel",
     desc: "Multi-wallet aggregation. Real-time P&L analytics. Tax report generation. Unified risk scoring across all positions.",
     tags: ["Multi-Wallet", "P&L Analytics", "Tax Reports", "Risk Score"],
+    route: "#/portfolio",
   },
   {
     icon: <Bell className="w-5 h-5" />,
@@ -366,6 +391,7 @@ const features = [
     title: "Alert System",
     desc: "Custom trigger engine. Push to Telegram, Discord, or webhook API. Price, volume, whale movement, and more.",
     tags: ["Real-Time", "Telegram", "Discord", "Webhooks"],
+    route: "#/alerts",
   },
   {
     icon: <Trophy className="w-5 h-5" />,
@@ -373,6 +399,7 @@ const features = [
     title: "Leaderboard",
     desc: "Top traders ranked by accuracy and earnings. Verified wallet performance. Follow the money, follow the winners.",
     tags: ["Traders", "Accuracy", "Earnings", "Verified"],
+    route: "#/leaderboard",
   },
 ];
 
@@ -395,7 +422,7 @@ function Features() {
               viewport={{ once: true, margin: "-40px" }}
               transition={{ delay: i * 0.08, duration: 0.4 }}
             >
-              <Card hoverable className="h-full group">
+              <Card hoverable className="h-full group cursor-pointer" onClick={() => navTo(f.route)}>
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-[#00ff41]">{f.icon}</span>
                   <span className="font-mono text-xs text-[#00ff41] bg-[rgba(0,255,65,0.08)] px-2 py-0.5 rounded">{f.command}</span>
@@ -583,10 +610,10 @@ function Footer() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
           {/* Brand */}
           <div className="lg:col-span-1">
-            <div className="flex items-center gap-2 mb-3">
+            <button onClick={() => navTo("#/landing")} className="flex items-center gap-2 mb-3 cursor-pointer">
               <Terminal className="w-4 h-4 text-[#00ff41]" />
               <span className="font-mono font-bold text-[#00ff41] text-lg">COMPO</span>
-            </div>
+            </button>
             <p className="text-sm text-[#71717a] mb-3">Solana Intelligence Terminal</p>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#10b981] terminal-glow" />
@@ -596,18 +623,45 @@ function Footer() {
 
           {/* Links */}
           {[
-            { title: "Product", links: ["Scanner", "Whale Radar", "Sniper", "Portfolio"] },
-            { title: "Developers", links: ["Documentation", "API Reference", "SDK", "Status"] },
-            { title: "Community", links: ["Discord", "Twitter", "Telegram", "Blog"] },
+            {
+              title: "Product",
+              links: [
+                { label: "Scanner", route: "#/scanner" },
+                { label: "Whale Radar", route: "#/whales" },
+                { label: "Sniper", route: "#/sniper" },
+                { label: "Portfolio", route: "#/portfolio" },
+              ],
+            },
+            {
+              title: "Developers",
+              links: [
+                { label: "Documentation", route: "#/docs" },
+                { label: "API Reference", route: "#/docs" },
+                { label: "SDK", route: "#/docs" },
+                { label: "Status", route: "#/docs" },
+              ],
+            },
+            {
+              title: "Community",
+              links: [
+                { label: "Discord", route: "#/docs" },
+                { label: "Twitter", route: "#/docs" },
+                { label: "Telegram", route: "#/docs" },
+                { label: "Blog", route: "#/docs" },
+              ],
+            },
           ].map((col) => (
             <div key={col.title}>
               <p className="font-mono text-xs text-[#525252] uppercase tracking-wider mb-3">{col.title}</p>
               <ul className="space-y-2">
                 {col.links.map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-sm text-[#71717a] hover:text-[#00ff41] transition-colors font-mono">
-                      {link}
-                    </a>
+                  <li key={link.label}>
+                    <button
+                      onClick={() => navTo(link.route)}
+                      className="text-sm text-[#71717a] hover:text-[#00ff41] transition-colors font-mono cursor-pointer"
+                    >
+                      {link.label}
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -620,10 +674,19 @@ function Footer() {
             The chain doesn&apos;t lie. &copy; 2026 COMPO
           </p>
           <div className="flex items-center gap-4">
-            {["Docs", "API", "Discord", "Twitter"].map((l) => (
-              <a key={l} href="#" className="font-mono text-xs text-[#525252] hover:text-[#71717a] transition-colors">
-                {l}
-              </a>
+            {[
+              { label: "Docs", route: "#/docs" },
+              { label: "API", route: "#/docs" },
+              { label: "Discord", route: "#/docs" },
+              { label: "Twitter", route: "#/docs" },
+            ].map((l) => (
+              <button
+                key={l.label}
+                onClick={() => navTo(l.route)}
+                className="font-mono text-xs text-[#525252] hover:text-[#71717a] transition-colors cursor-pointer"
+              >
+                {l.label}
+              </button>
             ))}
           </div>
         </div>
