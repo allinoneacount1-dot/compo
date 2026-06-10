@@ -15,8 +15,6 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children, title = "Overview", isMobileOpen = false, onMobileClose, onMobileMenuToggle }: DashboardLayoutProps) {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-
   // Close mobile menu on resize to desktop
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)");
@@ -30,7 +28,7 @@ export function DashboardLayout({ children, title = "Overview", isMobileOpen = f
   }, [isMobileOpen, onMobileClose]);
 
   return (
-    <div className="h-[100dvh] overflow-hidden">
+    <div className="h-[100dvh] overflow-hidden bg-[#0a0a0a]">
       {/* Mobile overlay when sidebar is open */}
       {isMobileOpen && (
         <div
@@ -40,29 +38,19 @@ export function DashboardLayout({ children, title = "Overview", isMobileOpen = f
         />
       )}
 
-      <Sidebar
-        collapsed={sidebarCollapsed}
-        onToggle={() => setSidebarCollapsed((prev) => !prev)}
-        isMobileOpen={isMobileOpen}
-        onMobileClose={onMobileClose}
-      />
-      <TopBar
-        title={title}
-        isMobileOpen={isMobileOpen}
-        onMobileClose={onMobileClose}
-        onMobileMenuToggle={onMobileMenuToggle}
-      />
+      {/* Topbar: fixed 64px, no overlap */}
+      <TopBar title={title} onMobileMenuToggle={onMobileMenuToggle} />
+
+      {/* Sidebar: fixed 260px, starts below topbar */}
+      <Sidebar isMobileOpen={isMobileOpen} onMobileClose={onMobileClose} />
+
+      {/* Status bar */}
       <StatusBar />
+
+      {/* Main content: scrollable, offset by topbar + sidebar */}
       <main
-        className={[
-          "h-[100dvh] overflow-y-auto overflow-x-hidden transition-[margin-left] duration-200 ease-out",
-          "ml-0",
-          sidebarCollapsed ? "md:ml-[64px]" : "md:ml-[240px]",
-        ].join(" ")}
-        style={{
-          paddingTop: 56,
-          paddingBottom: 28,
-        }}
+        className="h-[calc(100dvh-64px)] overflow-y-auto overflow-x-auto md:ml-[260px]"
+        style={{ paddingTop: 0, paddingBottom: 28 }}
       >
         {children}
       </main>

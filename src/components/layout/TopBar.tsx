@@ -1,115 +1,68 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { Search, Bell, Wallet, ChevronDown, Menu, X } from "lucide-react";
-import { truncateAddress } from "../../lib/utils/format";
+import { Search, Bell, Wallet, Menu } from "lucide-react";
 
 interface TopBarProps {
   title?: string;
-  actions?: ReactNode;
-  isMobileOpen?: boolean;
-  onMobileClose?: () => void;
   onMobileMenuToggle?: () => void;
 }
 
-export function TopBar({ title = "Overview", actions, isMobileOpen = false, onMobileMenuToggle }: TopBarProps) {
-  // Mock wallet state -- would come from zustand store in real app
-  const walletConnected = false;
-  const walletAddress = "0x7a3F8e2B9c4D1e5F6a7B3C8d9E0f2A1b4c5D3f2e";
-
+export function TopBar({ title = "Overview", onMobileMenuToggle }: TopBarProps) {
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-30 h-[56px] flex items-center justify-between px-3 md:px-4"
-      style={{
-        background: "#0a0a0b",
-        borderBottom: "1px solid rgba(255,255,255,0.06)",
-      }}
+      className="fixed top-0 left-0 right-0 z-50 h-16 flex items-center px-6"
+      style={{ background: "#111111", borderBottom: "1px solid #222" }}
     >
-      {/* Left: Hamburger (mobile) + Page title */}
-      <div className="flex items-center gap-2 md:gap-3 min-w-0">
-        {/* Hamburger menu -- mobile only, animated */}
+      {/* Left: Mobile menu + Logo */}
+      <div className="flex items-center gap-4 shrink-0">
         <button
           onClick={onMobileMenuToggle}
-          className="md:hidden w-9 h-9 flex items-center justify-center rounded hover:bg-[rgba(255,255,255,0.06)] transition-colors cursor-pointer relative"
+          className="md:hidden w-9 h-9 flex items-center justify-center rounded hover:bg-[#1a1a1a] transition-colors cursor-pointer"
           aria-label="Toggle menu"
         >
-          <div className="relative w-5 h-5 flex items-center justify-center">
-            {/* Menu icon */}
-            <Menu
-              className={[
-                "w-5 h-5 text-[#71717a] absolute transition-all duration-200",
-                isMobileOpen ? "opacity-0 rotate-90 scale-50" : "opacity-100 rotate-0 scale-100",
-              ].join(" ")}
-            />
-            {/* X icon */}
-            <X
-              className={[
-                "w-5 h-5 text-[#71717a] absolute transition-all duration-200",
-                isMobileOpen ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-50",
-              ].join(" ")}
-            />
-          </div>
+          <Menu className="w-5 h-5 text-[#a1a1aa]" />
         </button>
-        <h1 className="font-mono text-[14px] md:text-[15px] font-bold text-[#00ff41] tracking-wide truncate">
-          {title}
-        </h1>
+        <span className="font-mono text-lg font-bold text-[#00ff9f]">&gt; COMPO</span>
       </div>
 
-      {/* Right: Search + Chain + Notifications + Wallet */}
-      <div className="flex items-center gap-2 md:gap-3">
-        {/* Global search */}
-        <div className="hidden md:flex items-center relative">
-          <Search className="absolute left-3 w-4 h-4 text-[#525252] pointer-events-none" />
+      {/* Center: Global Search */}
+      <div className="flex-1 flex justify-center px-6">
+        <div className="relative w-full max-w-[420px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#52525b] pointer-events-none" />
           <input
             type="text"
-            placeholder="Search tokens, wallets, commands..."
-            className={[
-              "h-9 w-[280px] rounded pl-9 pr-14",
-              "bg-[#030303] border border-[rgba(255,255,255,0.08)]",
-              "text-[#e4e4e7] text-xs placeholder:text-[#525252]",
-              "focus:outline-none focus:border-[#3b82f6]/50",
-              "transition-colors duration-150 font-mono",
-            ].join(" ")}
+            placeholder="Search tokens, wallets, or commands..."
+            className="w-full h-10 bg-[#161616] border border-[#222] rounded-lg pl-10 pr-14 text-sm text-white placeholder:text-[#52525b] focus:outline-none focus:border-[#00ff9f]/40 transition-colors font-mono"
           />
-          <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded bg-[rgba(255,255,255,0.06)] text-[#525252] text-[10px] font-mono">
-            ⌘K
-          </kbd>
+          <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded bg-[#222] text-[#52525b] text-[10px] font-mono">⌘K</kbd>
+        </div>
+      </div>
+
+      {/* Right: SOL price + Connect + Notifications + Live */}
+      <div className="flex items-center gap-4 shrink-0">
+        {/* SOL price */}
+        <div className="hidden sm:flex items-center gap-1.5 font-mono text-sm">
+          <span className="text-[#a1a1aa]">$SOL</span>
+          <span className="text-[#00ff9f]">178.00</span>
         </div>
 
-        {/* Chain indicator */}
-        <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-[rgba(16,185,129,0.08)] border border-[rgba(16,185,129,0.15)]">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse" />
-          <span className="font-mono text-[10px] text-[#10b981] tracking-wider font-medium">
-            SOLANA ● LIVE
-          </span>
-        </div>
-
-        {/* Notification bell */}
-        <button className="relative w-9 h-9 rounded flex items-center justify-center bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.15)] transition-colors">
-          <Bell className="w-4 h-4 text-[#71717a]" />
-          <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#ef4444] text-white text-[8px] flex items-center justify-center font-bold">
-            5
-          </span>
+        {/* Notifications */}
+        <button className="relative w-9 h-9 rounded-lg flex items-center justify-center bg-[#161616] border border-[#222] hover:border-[#333] transition-colors">
+          <Bell className="w-4 h-4 text-[#a1a1aa]" />
+          <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#ff3b5c] text-white text-[8px] flex items-center justify-center font-bold">3</span>
         </button>
 
-        {/* Wallet button */}
-        {walletConnected ? (
-          <button className="hidden sm:flex items-center gap-2 h-9 px-3 rounded bg-[rgba(59,130,246,0.1)] border border-[rgba(59,130,246,0.2)] hover:border-[rgba(59,130,246,0.4)] transition-colors">
-            <Wallet className="w-4 h-4 text-[#3b82f6]" />
-            <span className="font-mono text-xs text-[#3b82f6]">
-              {truncateAddress(walletAddress, 4, 4)}
-            </span>
-            <ChevronDown className="w-3 h-3 text-[#3b82f6]" />
-          </button>
-        ) : (
-          <button className="flex items-center gap-2 h-9 px-3 rounded bg-[#3b82f6] hover:bg-[#2563eb] transition-colors">
-            <Wallet className="w-4 h-4 text-white" />
-            <span className="hidden sm:inline text-xs text-white font-medium">Connect</span>
-          </button>
-        )}
+        {/* Wallet Connect */}
+        <button className="flex items-center gap-2 h-9 px-4 rounded-lg bg-[#00ff9f] hover:bg-[#00cc7f] transition-colors">
+          <Wallet className="w-4 h-4 text-black" />
+          <span className="hidden sm:inline text-xs text-black font-semibold">Connect</span>
+        </button>
 
-        {/* Slot for additional actions */}
-        {actions}
+        {/* Live indicator */}
+        <div className="hidden lg:flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-[#00ff9f] animate-pulse" />
+          <span className="text-xs text-[#00ff9f] font-mono">LIVE</span>
+        </div>
       </div>
     </header>
   );

@@ -1,46 +1,38 @@
 "use client";
 
-import { useNetworkHealth } from "../../lib/hooks/useDexScreener";
-import { COMPO } from "../../lib/utils/constants";
+import { useState, useEffect } from "react";
 
 export function StatusBar() {
-  const { data: networkHealth, error: networkError } = useNetworkHealth();
+  const [slot, setSlot] = useState(284192447);
 
-  const slot = networkHealth?.slot ?? 284_192_447;
-  const latency = networkHealth?.latencyMs ?? 42;
-  const isHealthy = !networkError;
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSlot((prev) => prev + 400);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <footer
-      className="fixed bottom-0 left-0 right-0 z-30 h-[28px] flex items-center justify-between px-4"
-      style={{
-        background: "#030303",
-        borderTop: "1px solid rgba(255,255,255,0.04)",
-      }}
+    <div
+      className="fixed bottom-0 left-0 right-0 z-50 h-7 flex items-center gap-4 px-6"
+      style={{ background: "#111111", borderTop: "1px solid #222" }}
     >
-      {/* Left: Solana network status + live data indicators */}
-      <div className="flex items-center gap-4 font-mono text-[10px] text-[#525252]">
-        <span className="flex items-center gap-1.5">
-          <span className={["w-1 h-1 rounded-full", isHealthy ? "bg-[#10b981]" : "bg-[#FFB800]"].join(" ")} />
-          SOL
-        </span>
-        <span>SLOT {slot.toLocaleString()}</span>
-        <span>{latency}ms</span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-1 h-1 rounded-full bg-[#3b82f6] animate-pulse" />
-          DEXSCREENER
-        </span>
-      </div>
-
-      {/* Right: Version + connection */}
-      <div className="flex items-center gap-4 font-mono text-[10px] text-[#525252]">
-        <span>{COMPO.name} v{COMPO.version}</span>
-        <span>© 2026</span>
-        <span className="flex items-center gap-1.5">
-          <span className={["w-1 h-1 rounded-full", isHealthy ? "bg-[#10b981] animate-pulse" : "bg-[#FFB800]"].join(" ")} />
-          {isHealthy ? "CONNECTED" : "DEGRADED"}
-        </span>
-      </div>
-    </footer>
+      <span className="flex items-center gap-1.5">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#00ff9f] animate-pulse" />
+        <span className="font-mono text-[10px] text-[#00ff9f]">SOL</span>
+      </span>
+      <span className="font-mono text-[10px] text-[#52525b]">|</span>
+      <span className="font-mono text-[10px] text-[#a1a1aa]">SLOT {slot.toLocaleString()}</span>
+      <span className="font-mono text-[10px] text-[#52525b]">|</span>
+      <span className="font-mono text-[10px] text-[#a1a1aa]">42ms</span>
+      <span className="font-mono text-[10px] text-[#52525b]">|</span>
+      <span className="font-mono text-[10px] text-[#a1a1aa]">SCANS 14,847</span>
+      <span className="font-mono text-[10px] text-[#52525b]">|</span>
+      <span className="font-mono text-[10px] text-[#52525b]">COMPO v2.0.0</span>
+      <span className="ml-auto flex items-center gap-1.5">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#00ff9f] animate-pulse" />
+        <span className="font-mono text-[10px] text-[#00ff9f]">CONNECTED</span>
+      </span>
+    </div>
   );
 }

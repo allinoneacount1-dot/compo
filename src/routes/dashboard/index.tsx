@@ -2,30 +2,18 @@
 
 import { useState, useMemo, useCallback } from "react";
 import {
-  TrendingUp,
-  TrendingDown,
-  Eye,
-  ArrowUpRight,
-  ArrowDownRight,
-  Clock,
-  ShieldAlert,
-  ShieldX,
-  Activity,
-  Zap,
+  TrendingUp, TrendingDown, Eye, ArrowUpRight, ArrowDownRight,
+  Clock, ShieldAlert, ShieldX, Activity, Zap,
 } from "lucide-react";
 import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
 import { CountUp } from "../../components/ui/CountUp";
 import { formatNumber } from "../../lib/utils/format";
 import { MiniSparkline, QuickSellButtons } from "../../components/ui/MiniSparkline";
-import {
-  useKnownTokenPrices,
-  useNetworkHealth,
-} from "../../lib/hooks/useDexScreener";
+import { useKnownTokenPrices, useNetworkHealth } from "../../lib/hooks/useDexScreener";
 import type { TokenPrice } from "../../lib/hooks/useDexScreener";
 
-// --- Fallback mock data (used when API is loading or errors) -----------------
-
+// --- Fallback mock data ---
 const FALLBACK_WATCHLIST = [
   { symbol: "SOL", name: "Solana", address: "So11111111111111111111111111111111111111112", priceUsd: 178, priceChangeH24: 2.1, volumeH24: 8500000, liquidityUsd: 95000000, txnsH24: { buys: 12400, sells: 9800 } },
   { symbol: "BONK", name: "BONK", address: "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263", priceUsd: 0.00001245, priceChangeH24: 12.4, volumeH24: 4200000, liquidityUsd: 3800000, txnsH24: { buys: 8900, sells: 5200 } },
@@ -36,11 +24,11 @@ const FALLBACK_WATCHLIST = [
 ];
 
 const FALLBACK_ALERTS = [
-  { token: "$BONK", action: "Whale Buy", amount: "42.5 SOL", time: "2m ago", variant: "success" as const, icon: <ArrowUpRight className="w-3.5 h-3.5" /> },
-  { token: "$WIF", action: "LP Pulled", amount: "847 SOL", time: "8m ago", variant: "danger" as const, icon: <ArrowDownRight className="w-3.5 h-3.5" /> },
-  { token: "$POPCAT", action: "Whale Sell", amount: "120 SOL", time: "14m ago", variant: "warning" as const, icon: <ArrowDownRight className="w-3.5 h-3.5" /> },
-  { token: "$PYTH", action: "New Listing", amount: "Raydium", time: "22m ago", variant: "success" as const, icon: <ArrowUpRight className="w-3.5 h-3.5" /> },
-  { token: "$MOODENG", action: "Honeypot Alert", amount: "--", time: "31m ago", variant: "danger" as const, icon: <ShieldX className="w-3.5 h-3.5" /> },
+  { token: "$BONK", action: "Whale Buy", amount: "42.5 SOL", time: "2m ago", variant: "success" as const, icon: <ArrowUpRight className="w-3 h-3" /> },
+  { token: "$WIF", action: "LP Pulled", amount: "847 SOL", time: "8m ago", variant: "danger" as const, icon: <ArrowDownRight className="w-3 h-3" /> },
+  { token: "$POPCAT", action: "Whale Sell", amount: "120 SOL", time: "14m ago", variant: "warning" as const, icon: <ArrowDownRight className="w-3 h-3" /> },
+  { token: "$PYTH", action: "New Listing", amount: "Raydium", time: "22m ago", variant: "success" as const, icon: <ArrowUpRight className="w-3 h-3" /> },
+  { token: "$MOODENG", action: "Honeypot Alert", amount: "--", time: "31m ago", variant: "danger" as const, icon: <ShieldX className="w-3 h-3" /> },
 ];
 
 const FALLBACK_WHALES = [
@@ -53,12 +41,11 @@ const FALLBACK_WHALES = [
 
 const TREND_7D = [11200, 11800, 11400, 12100, 11900, 12400, 12847];
 
-// --- Helpers ------------------------------------------------------------------
-
+// --- Helpers ---
 function getScoreColor(score: number) {
-  if (score >= 70) return "text-[#00FF9F]";
+  if (score >= 70) return "text-[#00ff9f]";
   if (score >= 40) return "text-[#f59e0b]";
-  return "text-[#FF3B5C]";
+  return "text-[#ff3b5c]";
 }
 
 function formatCompactPrice(price: number): string {
@@ -70,7 +57,6 @@ function formatCompactPrice(price: number): string {
 }
 
 function generateSparkline(_price: number, change: number): number[] {
-  // Generate realistic sparkline based on price direction
   const points = 10;
   const data: number[] = [];
   let base = 50;
@@ -80,37 +66,26 @@ function generateSparkline(_price: number, change: number): number[] {
     base = Math.max(10, Math.min(90, base));
     data.push(base);
   }
-  // Ensure end point reflects direction
   data[data.length - 1] = change >= 0 ? 70 + Math.random() * 20 : 10 + Math.random() * 20;
   return data;
 }
 
 function estimateRisk(token: TokenPrice): number {
-  // Risk estimation based on on-chain metrics
-  // Low liquidity + high volume = high risk (potential rug)
   const liqVolRatio = token.liquidityUsd > 0 ? token.volumeH24 / token.liquidityUsd : 100;
   const totalTxns = token.txnsH24.buys + token.txnsH24.sells;
   const buyRatio = totalTxns > 0 ? token.txnsH24.buys / totalTxns : 0.5;
-
   let risk = 50;
   if (liqVolRatio > 5) risk += 20;
   else if (liqVolRatio > 2) risk += 10;
   else if (liqVolRatio < 0.5) risk -= 10;
-
   if (buyRatio > 0.8 || buyRatio < 0.2) risk += 15;
-  else if (buyRatio > 0.7 || buyRatio < 0.3) risk += 8;
-
   if (token.liquidityUsd > 10_000_000) risk -= 15;
   else if (token.liquidityUsd < 500_000) risk += 10;
-
   if (Math.abs(token.priceChangeH24) > 50) risk += 15;
-  else if (Math.abs(token.priceChangeH24) > 20) risk += 8;
-
   return Math.max(0, Math.min(100, risk));
 }
 
-// --- SVG Portfolio Chart -----------------------------------------------------
-
+// --- SVG Portfolio Chart ---
 function PortfolioChart({ data, width = 500, height = 140 }: { data: number[]; width?: number; height?: number }) {
   const padding = { top: 12, bottom: 16, left: 0, right: 0 };
   const chartW = width - padding.left - padding.right;
@@ -124,80 +99,30 @@ function PortfolioChart({ data, width = 500, height = 140 }: { data: number[]; w
   }));
   const polyline = points.map((p) => `${p.x},${p.y}`).join(" ");
   const areaPath = `${polyline} ${points[points.length - 1].x},${height - padding.bottom} ${points[0].x},${height - padding.bottom} Z`;
-  const gradId = useMemo(() => `chartGrad-${Math.random().toString(36).slice(2, 8)}`, []);
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto" preserveAspectRatio="none">
       <defs>
-        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#00FF9F" stopOpacity="0.2" />
-          <stop offset="100%" stopColor="#00FF9F" stopOpacity="0" />
+        <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#00ff9f" stopOpacity="0.15" />
+          <stop offset="100%" stopColor="#00ff9f" stopOpacity="0" />
         </linearGradient>
       </defs>
-      {[0, 0.25, 0.5, 0.75, 1].map((frac) => {
-        const y = padding.top + chartH * frac;
-        return <line key={frac} x1={padding.left} y1={y} x2={width - padding.right} y2={y} stroke="rgba(255,255,255,0.03)" strokeWidth="1" />;
-      })}
-      <path d={areaPath} fill={`url(#${gradId})`} />
-      <polyline points={polyline} fill="none" stroke="#00FF9F" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d={areaPath} fill="url(#chartGrad)" />
+      <polyline points={polyline} fill="none" stroke="#00ff9f" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       {points.length > 0 && (
-        <circle cx={points[points.length - 1].x} cy={points[points.length - 1].y} r="3" fill="#0a0a0b" stroke="#00FF9F" strokeWidth="1.5" />
+        <circle cx={points[points.length - 1].x} cy={points[points.length - 1].y} r="3" fill="#0a0a0a" stroke="#00ff9f" strokeWidth="1.5" />
       )}
     </svg>
   );
 }
 
-// --- Real-time Price Ticker Bar -----------------------------------------------
-
-function LiveTicker({ tokens }: { tokens: TokenPrice[] }) {
-  if (tokens.length === 0) return null;
-
-  return (
-    <div className="overflow-hidden border-b border-[rgba(255,255,255,0.04)]">
-      <div className="flex items-center gap-6 py-1.5 px-3 animate-marquee">
-        {[...tokens, ...tokens].map((t, i) => (
-          <div key={`${t.symbol}-${i}`} className="flex items-center gap-2 flex-shrink-0">
-            <span className="font-mono text-[10px] font-bold text-[#e4e4e7]">${t.symbol}</span>
-            <span className="font-mono text-[10px] text-[#a1a1aa]">{formatCompactPrice(t.priceUsd)}</span>
-            <span className={["font-mono text-[9px]", t.priceChangeH24 >= 0 ? "text-[#00FF9F]" : "text-[#FF3B5C]"].join(" ")}>
-              {t.priceChangeH24 >= 0 ? "+" : ""}{t.priceChangeH24.toFixed(1)}%
-            </span>
-            <span className="text-[#333]">|</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// --- Live Data Banner ---------------------------------------------------------
-
-function DataStatusBanner({ lastUpdate, isLoading, error }: { lastUpdate: Date | null; isLoading: boolean; error: string | null }) {
-  return (
-    <div className="flex items-center gap-3 px-3 py-1.5 text-[10px] font-mono border-b border-[rgba(255,255,255,0.04)]">
-      <div className="flex items-center gap-1.5">
-        <span className={["w-1.5 h-1.5 rounded-full", error ? "bg-[#FF3B5C]" : isLoading ? "bg-[#FFB800] animate-pulse" : "bg-[#00FF9F]"].join(" ")} />
-        <span className={error ? "text-[#FF3B5C]" : "text-[#00FF9F]"}>{error ? "DEGRADED (FALLBACK DATA)" : "LIVE DATA -- DEXSCREENER"}</span>
-      </div>
-      {lastUpdate && (
-        <span className="text-[#525252]">
-          Updated: {lastUpdate.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
-        </span>
-      )}
-    </div>
-  );
-}
-
-// --- Component ----------------------------------------------------------------
-
+// --- Component ---
 export default function DashboardOverview() {
   const { data: livePrices, loading: pricesLoading, error: pricesError } = useKnownTokenPrices();
   const { error: networkError } = useNetworkHealth();
+  const [chartPeriod] = useState<"7D" | "30D">("7D");
 
-  const [chartPeriod, setChartPeriod] = useState<"7D" | "30D">("7D");
-  const lastUpdate = livePrices ? new Date() : null;
-
-  // Use live data or fallback
   const tokens = livePrices && livePrices.length > 0 ? livePrices : FALLBACK_WATCHLIST;
 
   const watchlist = useMemo(() =>
@@ -208,288 +133,212 @@ export default function DashboardOverview() {
       risk: estimateRisk(t),
       volume: t.volumeH24,
       sparkline: generateSparkline(t.priceUsd, t.priceChangeH24),
-    })),
-    [tokens]
-  );
+    })), [tokens]);
 
   const totalVolume = useMemo(() => tokens.reduce((s, t) => s + t.volumeH24, 0), [tokens]);
-
-  // Simulated portfolio based on real SOL price
   const solPrice = tokens.find((t) => t.symbol === "SOL")?.priceUsd ?? 178;
-  const totalPortfolioUsd = 12847 * (solPrice / 178); // Scale with real SOL price
+  const totalPortfolioUsd = 12847 * (solPrice / 178);
 
   const handleQuickSell = useCallback((token: string, pct: number) => {
     console.log(`Quick sell ${pct}% of ${token}`);
   }, []);
 
   return (
-    <>
-      {/* Live data banner */}
-      <DataStatusBanner lastUpdate={lastUpdate} isLoading={pricesLoading} error={pricesError} />
-
-      {/* Ticker bar */}
-      <LiveTicker tokens={tokens.slice(0, 8)} />
-
-      <div className="p-2.5 space-y-2.5">
-        {/* -- Row 1: Portfolio + Network Stats -- */}
-        <div className="grid grid-cols-12 gap-2.5">
-          {/* Portfolio Value -- 7 cols */}
-          <div className="col-span-12 lg:col-span-7">
-            <Card hoverable>
-              <div className="flex items-center justify-between mb-0.5">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00FF9F] animate-pulse" />
-                  <span className="font-mono text-[9px] text-[#525252] uppercase tracking-wider">
-                    Portfolio Value
-                  </span>
-                  <span className="font-mono text-[8px] text-[#3b82f6] bg-[rgba(59,130,246,0.1)] px-1 rounded">
-                    LIVE
-                  </span>
-                </div>
-                <div className="flex items-center gap-0.5 bg-[#0a0a0b] rounded p-0.5">
-                  {(["7D", "30D"] as const).map((period) => (
-                    <button
-                      key={period}
-                      onClick={() => setChartPeriod(period)}
-                      className={[
-                        "font-mono text-[9px] px-1.5 py-0.5 rounded transition-colors duration-150",
-                        chartPeriod === period
-                          ? "bg-[rgba(0,255,159,0.12)] text-[#00FF9F]"
-                          : "text-[#525252] hover:text-[#a1a1aa]",
-                      ].join(" ")}
-                    >
-                      {period}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="mt-1 mb-0.5">
-                <span className="text-2xl font-bold font-mono text-[#e4e4e7] tracking-tight">
-                  <CountUp value={Math.round(totalPortfolioUsd)} prefix="$" />
-                </span>
-                <span className="font-mono text-[10px] text-[#525252] ml-2">
-                  ~{(totalPortfolioUsd / solPrice).toFixed(2)} SOL
-                </span>
-              </div>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="flex items-center gap-1">
-                  <TrendingUp className="w-3 h-3 text-[#00FF9F]" />
-                  <span className="font-mono text-[11px] font-bold text-[#00FF9F]">
-                    +${Math.round(totalPortfolioUsd - 12847)} ({(((totalPortfolioUsd / 12847) - 1) * 100).toFixed(2)}%)
-                  </span>
-                  <span className="font-mono text-[9px] text-[#525252] ml-0.5">24h</span>
-                </div>
-                <span className="font-mono text-[9px] text-[#71717a]">SOL: {formatCompactPrice(solPrice)}</span>
-              </div>
-              <div className="-mx-1">
-                <PortfolioChart data={TREND_7D} />
-              </div>
-            </Card>
+    <div className="p-6 space-y-4">
+      {/* -- Row 1: Portfolio (7 cols) + Top Movers (5 cols) -- */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
+        {/* Portfolio Value */}
+        <div className="xl:col-span-7 bg-[#161616] border border-[#222] rounded-xl p-5">
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00ff9f] animate-pulse" />
+              <span className="font-mono text-[10px] text-[#52525b] uppercase tracking-wider">Portfolio Value</span>
+            </div>
+            <div className="flex items-center gap-1 bg-[#111] rounded p-0.5">
+              {(["7D", "30D"] as const).map((period) => (
+                <button key={period} className={["font-mono text-[9px] px-2 py-0.5 rounded transition-colors", chartPeriod === period ? "bg-[#00ff9f]/10 text-[#00ff9f]" : "text-[#52525b] hover:text-[#a1a1aa]"].join(" ")}>
+                  {period}
+                </button>
+              ))}
+            </div>
           </div>
-
-          {/* Real-time Network + Token Stats -- 5 cols */}
-          <div className="col-span-12 lg:col-span-5 space-y-2.5">
-            {/* Solana Network Card */}
-            <Card hoverable>
-              <div className="flex items-center gap-1.5 mb-2">
-                <Zap className="w-3 h-3 text-[#9945FF]" />
-                <span className="font-mono text-[9px] text-[#525252] uppercase tracking-wider">Solana Network</span>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <span className="font-mono text-[9px] text-[#525252]">SOL Price</span>
-                  <p className="font-mono text-[13px] font-bold text-[#e4e4e7]">{formatCompactPrice(solPrice)}</p>
-                </div>
-                <div>
-                  <span className="font-mono text-[9px] text-[#525252]">24h Volume</span>
-                  <p className="font-mono text-[13px] font-bold text-[#e4e4e7]">${formatNumber(totalVolume)}</p>
-                </div>
-                <div>
-                  <span className="font-mono text-[9px] text-[#525252]">Active Tokens</span>
-                  <p className="font-mono text-[13px] font-bold text-[#e4e4e7]">{tokens.length}</p>
-                </div>
-                <div>
-                  <span className="font-mono text-[9px] text-[#525252]">Status</span>
-                  <p className={["font-mono text-[13px] font-bold", networkError ? "text-[#FFB800]" : "text-[#00FF9F]"].join(" ")}>
-                    {networkError ? "DEGRADED" : "ONLINE"}
-                  </p>
-                </div>
-              </div>
-            </Card>
-
-            {/* Top Movers */}
-            <Card hoverable>
-              <div className="flex items-center gap-1.5 mb-2">
-                <Activity className="w-3 h-3 text-[#3b82f6]" />
-                <span className="font-mono text-[9px] text-[#525252] uppercase tracking-wider">Top Movers (24h)</span>
-              </div>
-              <div className="space-y-1">
-                {[...tokens]
-                  .sort((a, b) => Math.abs(b.priceChangeH24) - Math.abs(a.priceChangeH24))
-                  .slice(0, 4)
-                  .map((t) => (
-                    <div key={t.symbol} className="flex items-center justify-between py-0.5">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-mono text-[10px] font-bold text-[#00FF9F]">${t.symbol}</span>
-                        <span className="font-mono text-[9px] text-[#525252]">{formatCompactPrice(t.priceUsd)}</span>
-                      </div>
-                      <span className={["font-mono text-[10px] font-bold", t.priceChangeH24 >= 0 ? "text-[#00FF9F]" : "text-[#FF3B5C]"].join(" ")}>
-                        {t.priceChangeH24 >= 0 ? "+" : ""}{t.priceChangeH24.toFixed(1)}%
-                      </span>
-                    </div>
-                  ))}
-              </div>
-            </Card>
+          <div className="text-4xl font-semibold font-mono tracking-tight">
+            <CountUp value={Math.round(totalPortfolioUsd)} prefix="$" />
           </div>
+          <div className="flex items-center gap-3 mt-1 mb-3">
+            <div className="flex items-center gap-1">
+              <TrendingUp className="w-3 h-3 text-[#00ff9f]" />
+              <span className="font-mono text-[11px] font-bold text-[#00ff9f]">
+                +${Math.round(totalPortfolioUsd - 12847)} ({(((totalPortfolioUsd / 12847) - 1) * 100).toFixed(2)}%)
+              </span>
+              <span className="font-mono text-[9px] text-[#52525b] ml-0.5">24h</span>
+            </div>
+            <span className="font-mono text-[10px] text-[#52525b]">SOL: {formatCompactPrice(solPrice)}</span>
+          </div>
+          <PortfolioChart data={TREND_7D} />
         </div>
 
-        {/* -- Row 2: Stats Cards -- */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
-          {[
-            { label: "Active Positions", value: tokens.length.toString(), sub: "tokens tracked", icon: <Eye className="w-3 h-3" />, color: "text-[#00FF9F]" },
-            { label: "Avg Risk Score", value: Math.round(watchlist.reduce((s, w) => s + w.risk, 0) / Math.max(watchlist.length, 1)).toString(), sub: "/100", icon: <ShieldAlert className="w-3 h-3" />, color: "text-[#f59e0b]" },
-            { label: "24h Volume", value: `$${formatNumber(totalVolume)}`, sub: "across tracked", icon: <TrendingUp className="w-3 h-3" />, color: "text-[#3b82f6]" },
-            { label: "Data Source", value: "DexScreener", sub: "real-time API", icon: <Activity className="w-3 h-3" />, color: "text-[#a855f7]" },
-          ].map((stat) => (
-            <Card key={stat.label} hoverable>
-              <div className="flex items-center justify-between mb-0.5">
-                <span className="font-mono text-[9px] text-[#525252] uppercase tracking-wider">{stat.label}</span>
-                <span className={stat.color + "/60"}>{stat.icon}</span>
-              </div>
-              <p className="text-lg font-bold font-mono text-[#e4e4e7]">{stat.value}</p>
-              <p className="font-mono text-[9px] text-[#71717a] mt-0.5">{stat.sub}</p>
-            </Card>
-          ))}
-        </div>
-
-        {/* -- Row 3: Active Alerts + Whale Movements -- */}
-        <div className="grid grid-cols-12 gap-2.5">
-          {/* Active Alerts -- 4 cols */}
-          <div className="col-span-12 lg:col-span-4">
-            <Card hoverable>
-              <div className="flex items-center justify-between mb-1.5">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00FF9F] animate-pulse" />
-                  <span className="font-mono text-[9px] text-[#525252] uppercase tracking-wider">
-                    Active Alerts
-                  </span>
-                </div>
-                <Badge variant="danger" size="sm">3 HOT</Badge>
-              </div>
-              <div className="space-y-0">
-                {FALLBACK_ALERTS.map((alert, i) => {
-                  const bgColor =
-                    alert.variant === "success" ? "rgba(0,255,159,0.08)"
-                    : alert.variant === "danger" ? "rgba(255,59,92,0.08)"
-                    : "rgba(245,158,11,0.08)";
-                  const textColor =
-                    alert.variant === "success" ? "text-[#00FF9F]"
-                    : alert.variant === "danger" ? "text-[#FF3B5C]"
-                    : "text-[#f59e0b]";
-                  return (
-                    <div key={i} className="flex items-center gap-1.5 py-1.5 px-1 rounded hover:bg-[rgba(255,255,255,0.03)] transition-colors duration-150 cursor-default">
-                      <div className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0" style={{ background: bgColor }}>
-                        <span className={textColor}>{alert.icon}</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1">
-                          <span className="font-mono text-[10px] font-bold text-[#e4e4e7]">{alert.token}</span>
-                          <span className="font-mono text-[9px] text-[#525252]">{alert.action}</span>
-                        </div>
-                        <span className="font-mono text-[9px] text-[#71717a]">{alert.amount}</span>
-                      </div>
-                      <div className="flex items-center gap-0.5 flex-shrink-0">
-                        <Clock className="w-2 h-2 text-[#525252]" />
-                        <span className="font-mono text-[9px] text-[#525252]">{alert.time}</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </Card>
-          </div>
-
-          {/* Whale Movements -- 8 cols */}
-          <div className="col-span-12 lg:col-span-8">
-            <Card hoverable>
-              <div className="flex items-center justify-between mb-1.5">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#3b82f6] animate-pulse" />
-                  <span className="font-mono text-[9px] text-[#525252] uppercase tracking-wider">
-                    Whale Movements -- Top Volume
-                  </span>
-                </div>
-                <span className="font-mono text-[9px] text-[#525252]">Live from DexScreener</span>
-              </div>
-              <div className="space-y-0">
-                <div className="grid grid-cols-[1fr_55px_75px_75px_55px] gap-1.5 px-1.5 py-1 border-b border-[rgba(255,255,255,0.06)]">
-                  {["Wallet", "Action", "Token", "Amount", "Time"].map((h) => (
-                    <span key={h} className="font-mono text-[9px] text-[#525252] uppercase tracking-wider">{h}</span>
-                  ))}
-                </div>
-                {FALLBACK_WHALES.map((m, i) => {
-                  const isBuy = m.action === "BUY";
-                  return (
-                    <div key={i} className="grid grid-cols-[1fr_55px_75px_75px_55px] gap-1.5 px-1.5 py-1 border-b border-[rgba(255,255,255,0.03)] hover:bg-[rgba(0,255,159,0.03)] transition-colors duration-150 cursor-default">
-                      <span className="font-mono text-[10px] text-[#3b82f6] truncate">{m.wallet}</span>
-                      <span className={["font-mono text-[9px] font-bold uppercase px-1 py-0.5 rounded w-fit", isBuy ? "text-[#00FF9F] bg-[rgba(0,255,159,0.1)]" : "text-[#FF3B5C] bg-[rgba(255,59,92,0.1)]"].join(" ")}>
-                        {m.action}
-                      </span>
-                      <span className="font-mono text-[10px] text-[#e4e4e7] truncate">{m.token}</span>
-                      <span className="font-mono text-[10px] text-[#71717a]">{formatNumber(m.amount)} SOL</span>
-                      <span className="font-mono text-[9px] text-[#525252]">{m.time}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </Card>
-          </div>
-        </div>
-
-        {/* -- Row 4: Live Watchlist -- */}
-        <div className="grid grid-cols-12 gap-2.5">
-          <div className="col-span-12">
-            <Card hoverable>
-              <div className="flex items-center justify-between mb-1.5">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00FF9F] animate-pulse" />
-                  <span className="font-mono text-[9px] text-[#525252] uppercase tracking-wider">Live Watchlist</span>
-                  <span className="font-mono text-[8px] text-[#3b82f6] bg-[rgba(59,130,246,0.1)] px-1 rounded">
-                    {pricesLoading ? "LOADING..." : `${watchlist.length} TOKENS`}
-                  </span>
-                </div>
-                <span className="font-mono text-[9px] text-[#525252]">
-                  {pricesError ? "Fallback data -- API error" : "Real-time from DexScreener"}
-                </span>
-              </div>
-              <div className="space-y-0">
-                <div className="grid grid-cols-[1fr_80px_60px_50px_50px_64px_70px] gap-1.5 px-1.5 py-1 border-b border-[rgba(255,255,255,0.06)]">
-                  {["Token", "Price", "24h", "Risk", "Volume", "Chart", "Quick Sell"].map((h) => (
-                    <span key={h} className="font-mono text-[9px] text-[#525252] uppercase tracking-wider">{h}</span>
-                  ))}
-                </div>
-                {watchlist.map((t) => (
-                  <div key={t.token} className="grid grid-cols-[1fr_80px_60px_50px_50px_64px_70px] gap-1.5 px-1.5 py-1 border-b border-[rgba(255,255,255,0.03)] hover:bg-[rgba(0,255,159,0.03)] transition-colors duration-150 cursor-default">
-                    <span className="font-mono text-[10px] text-[#00FF9F] font-bold">${t.token}</span>
-                    <span className="font-mono text-[10px] text-[#e4e4e7]">{formatCompactPrice(t.price)}</span>
-                    <span className={["font-mono text-[10px] font-bold flex items-center gap-0.5", t.change >= 0 ? "text-[#00FF9F]" : "text-[#FF3B5C]"].join(" ")}>
-                      {t.change >= 0 ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
-                      {t.change >= 0 ? "+" : ""}{t.change.toFixed(1)}%
-                    </span>
-                    <div className="flex items-center gap-0.5">
-                      <span className={["font-mono text-[10px] font-bold", getScoreColor(t.risk)].join(" ")}>{t.risk}</span>
-                      <span className="font-mono text-[9px] text-[#525252]">/100</span>
-                    </div>
-                    <span className="font-mono text-[9px] text-[#71717a]">${formatNumber(t.volume)}</span>
-                    <MiniSparkline data={t.sparkline} color={t.change >= 0 ? "#00FF9F" : "#FF3B5C"} width={64} height={20} />
-                    <QuickSellButtons symbol={t.token} onSell={handleQuickSell} />
+        {/* Top Movers + Network */}
+        <div className="xl:col-span-5 space-y-4">
+          {/* Top Movers */}
+          <div className="bg-[#161616] border border-[#222] rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Activity className="w-3.5 h-3.5 text-[#3b82f6]" />
+              <span className="font-mono text-[10px] text-[#52525b] uppercase tracking-wider">Top Movers (24H)</span>
+            </div>
+            <div className="space-y-2">
+              {[...tokens].sort((a, b) => Math.abs(b.priceChangeH24) - Math.abs(a.priceChangeH24)).slice(0, 5).map((t) => (
+                <div key={t.symbol} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-[11px] font-bold text-white">${t.symbol}</span>
+                    <span className="font-mono text-[10px] text-[#52525b]">{formatCompactPrice(t.priceUsd)}</span>
                   </div>
-                ))}
+                  <span className={["font-mono text-[11px] font-bold", t.priceChangeH24 >= 0 ? "text-[#00ff9f]" : "text-[#ff3b5c]"].join(" ")}>
+                    {t.priceChangeH24 >= 0 ? "+" : ""}{t.priceChangeH24.toFixed(1)}%
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Network Stats */}
+          <div className="bg-[#161616] border border-[#222] rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Zap className="w-3.5 h-3.5 text-[#9945FF]" />
+              <span className="font-mono text-[10px] text-[#52525b] uppercase tracking-wider">Solana Network</span>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <span className="font-mono text-[9px] text-[#52525b]">Daily Active Users</span>
+                <p className="font-mono text-[13px] font-bold text-white">4.16M</p>
               </div>
-            </Card>
+              <div>
+                <span className="font-mono text-[9px] text-[#52525b]">Transactions (24h)</span>
+                <p className="font-mono text-[13px] font-bold text-white">102.7M</p>
+              </div>
+              <div>
+                <span className="font-mono text-[9px] text-[#52525b]">DeFi TVL</span>
+                <p className="font-mono text-[13px] font-bold text-[#ff3b5c]">$4.77B</p>
+              </div>
+              <div>
+                <span className="font-mono text-[9px] text-[#52525b]">Status</span>
+                <p className={["font-mono text-[13px] font-bold", networkError ? "text-[#f59e0b]" : "text-[#00ff9f]"].join(" ")}>
+                  {networkError ? "DEGRADED" : "ONLINE"}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </>
+
+      {/* -- Row 2: Active Positions (5) + Whale Movements (7) -- */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
+        {/* Active Positions */}
+        <div className="xl:col-span-5 bg-[#161616] border border-[#222] rounded-xl p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Eye className="w-3.5 h-3.5 text-[#00ff9f]" />
+              <span className="font-mono text-[10px] text-[#52525b] uppercase tracking-wider">Active Positions</span>
+              <span className="font-mono text-[10px] text-[#52525b]">(6)</span>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {watchlist.slice(0, 6).map((pos) => (
+              <div key={pos.token} className="bg-[#111] rounded-lg p-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[11px] font-bold text-white">${pos.token}</span>
+                  <span className={["font-mono text-[11px] font-bold", pos.change >= 0 ? "text-[#00ff9f]" : "text-[#ff3b5c]"].join(" ")}>
+                    {pos.change >= 0 ? "+" : ""}{pos.change.toFixed(1)}%
+                  </span>
+                </div>
+                <div className="text-[10px] text-[#52525b] mt-1">{formatCompactPrice(pos.price)}</div>
+                <MiniSparkline data={pos.sparkline} color={pos.change >= 0 ? "#00ff9f" : "#ff3b5c"} width={80} height={24} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Whale Movements */}
+        <div className="xl:col-span-7 bg-[#161616] border border-[#222] rounded-xl p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#3b82f6] animate-pulse" />
+              <span className="font-mono text-[10px] text-[#52525b] uppercase tracking-wider">Whale Movements (Live)</span>
+            </div>
+            <span className="font-mono text-[9px] text-[#52525b]">Live from DexScreener</span>
+          </div>
+          <table className="w-full text-sm font-mono">
+            <thead>
+              <tr className="text-[#52525b] text-[10px] border-b border-[#222]">
+                <th className="text-left py-2 px-2">Time</th>
+                <th className="text-left py-2 px-2">Wallet</th>
+                <th className="text-left py-2 px-2">Action</th>
+                <th className="text-left py-2 px-2">Token</th>
+                <th className="text-right py-2 px-2">Amount</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#222]">
+              {FALLBACK_WHALES.map((m, i) => (
+                <tr key={i} className="hover:bg-[#1a1a1a]">
+                  <td className="py-2 px-2 text-[#52525b] text-[11px]">{m.time}</td>
+                  <td className="py-2 px-2 text-[#3b82f6] text-[11px]">{m.wallet}</td>
+                  <td className="py-2 px-2">
+                    <span className={["text-[10px] font-bold px-1.5 py-0.5 rounded", m.action === "BUY" ? "text-[#00ff9f] bg-[#00ff9f]/10" : "text-[#ff3b5c] bg-[#ff3b5c]/10"].join(" ")}>
+                      {m.action}
+                    </span>
+                  </td>
+                  <td className="py-2 px-2 text-white text-[11px]">{m.token}</td>
+                  <td className="py-2 px-2 text-right text-[#a1a1aa] text-[11px]">{formatNumber(m.amount)} SOL</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* -- Row 3: Live Watchlist (full width) -- */}
+      <div className="bg-[#161616] border border-[#222] rounded-xl p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00ff9f] animate-pulse" />
+            <span className="font-mono text-[10px] text-[#52525b] uppercase tracking-wider">Live Watchlist</span>
+            <span className="font-mono text-[9px] text-[#3b82f6] bg-[#3b82f6]/10 px-1.5 py-0.5 rounded">{watchlist.length} TOKENS</span>
+          </div>
+          <span className="font-mono text-[9px] text-[#52525b]">{pricesError ? "Fallback data" : "Real-time DexScreener"}</span>
+        </div>
+        <table className="w-full text-sm font-mono">
+          <thead>
+            <tr className="text-[#52525b] text-[10px] border-b border-[#222]">
+              <th className="text-left py-2 px-2">Token</th>
+              <th className="text-left py-2 px-2">Price</th>
+              <th className="text-left py-2 px-2">24h</th>
+              <th className="text-left py-2 px-2">Risk</th>
+              <th className="text-left py-2 px-2">Volume</th>
+              <th className="text-left py-2 px-2">Chart</th>
+              <th className="text-left py-2 px-2">Quick Sell</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-[#222]">
+            {watchlist.map((t) => (
+              <tr key={t.token} className="hover:bg-[#1a1a1a]">
+                <td className="py-2 px-2 text-[#00ff9f] font-bold text-[11px]">${t.token}</td>
+                <td className="py-2 px-2 text-white text-[11px]">{formatCompactPrice(t.price)}</td>
+                <td className={["py-2 px-2 font-bold text-[11px] flex items-center gap-1", t.change >= 0 ? "text-[#00ff9f]" : "text-[#ff3b5c]"].join(" ")}>
+                  {t.change >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                  {t.change >= 0 ? "+" : ""}{t.change.toFixed(1)}%
+                </td>
+                <td className="py-2 px-2">
+                  <span className={["font-bold text-[11px]", getScoreColor(t.risk)].join(" ")}>{t.risk}</span>
+                  <span className="text-[#52525b] text-[10px]">/100</span>
+                </td>
+                <td className="py-2 px-2 text-[#52525b] text-[10px]">${formatNumber(t.volume)}</td>
+                <td className="py-2 px-2"><MiniSparkline data={t.sparkline} color={t.change >= 0 ? "#00ff9f" : "#ff3b5c"} width={64} height={20} /></td>
+                <td className="py-2 px-2"><QuickSellButtons symbol={t.token} onSell={handleQuickSell} /></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }
