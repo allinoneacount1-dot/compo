@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import "./styles/globals.css";
 import "./styles/terminal.css";
-import BootingPage from "./routes/index";
 import LandingPage from "./routes/landing";
 import { DashboardLayout } from "./components/layout/DashboardLayout";
 import DashboardOverview from "./routes/dashboard/index";
@@ -15,10 +14,10 @@ import SettingsPage from "./routes/dashboard/settings";
 import OnChainPage from "./routes/dashboard/onchain";
 import DocsPage from "./routes/docs";
 
-type Page = "booting" | "landing" | "docs" | "dashboard" | "scanner" | "whales" | "sniper" | "portfolio" | "alerts" | "leaderboard" | "onchain" | "settings";
+type Page = "landing" | "docs" | "dashboard" | "scanner" | "whales" | "sniper" | "portfolio" | "alerts" | "leaderboard" | "onchain" | "settings";
 
 function getInitialPage(): Page {
-  if (typeof window === "undefined") return "booting";
+  if (typeof window === "undefined") return "landing";
   const hash = window.location.hash.replace("#", "") || "/";
   if (hash.startsWith("/scanner")) return "scanner";
   if (hash.startsWith("/whales")) return "whales";
@@ -30,8 +29,7 @@ function getInitialPage(): Page {
   if (hash.startsWith("/settings")) return "settings";
   if (hash.startsWith("/docs")) return "docs";
   if (hash.startsWith("/dashboard")) return "dashboard";
-  if (hash === "/landing") return "landing";
-  return "booting";
+  return "landing";
 }
 
 function getPageTitle(page: Page): string {
@@ -61,12 +59,10 @@ function App() {
     return () => window.removeEventListener("hashchange", handleHash);
   }, [handleHash]);
 
-  // Close mobile menu on hash change (navigation)
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [page]);
 
-  // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = "hidden";
@@ -85,10 +81,6 @@ function App() {
   const handleMobileMenuClose = useCallback(() => {
     setIsMobileMenuOpen(false);
   }, []);
-
-  if (page === "booting") {
-    return <BootingPage />;
-  }
 
   if (page === "landing") {
     return <LandingPage />;
