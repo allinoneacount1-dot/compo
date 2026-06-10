@@ -75,17 +75,17 @@ export default function DocsPage() {
   const current = sections.find((s) => s.id === active);
 
   return (
-    <div className="min-h-screen bg-[#030303] text-[#e4e4e7]">
+    <div className="min-h-screen bg-[#0a0a0a] text-white">
       {/* Header */}
-      <div className="border-b border-[rgba(255,255,255,0.06)]">
+      <div className="border-b border-[#222]">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="flex items-center gap-3 mb-4">
-            <Book className="w-8 h-8 text-[#00ff41]" />
+            <Book className="w-8 h-8 text-[#00ff9f]" />
             <h1 className="text-3xl sm:text-4xl font-bold">
-              <span className="text-[#00ff41] font-mono">COMPO</span> Documentation
+              <span className="text-[#00ff9f] font-mono">COMPO</span> Documentation
             </h1>
           </div>
-          <p className="text-[#71717a] max-w-2xl">
+          <p className="text-[#52525b] max-w-2xl">
             Everything you need to integrate, configure, and master the Solana Intelligence Terminal.
           </p>
           <div className="flex gap-3 mt-6">
@@ -103,7 +103,7 @@ export default function DocsPage() {
         {/* Sidebar */}
         <aside className="hidden md:block w-56 shrink-0">
           <div className="sticky top-24 space-y-1">
-            <p className="font-mono text-[10px] text-[#525252] uppercase tracking-wider mb-3">
+            <p className="font-mono text-[10px] text-[#52525b] uppercase tracking-wider mb-3">
               Navigation
             </p>
             {sections.map((s) => (
@@ -114,8 +114,8 @@ export default function DocsPage() {
                   "w-full flex items-center gap-2 h-9 px-3 text-left cursor-pointer",
                   "font-mono text-[12px] transition-colors duration-100 rounded",
                   active === s.id
-                    ? "text-[#00ff41] bg-[rgba(0,255,65,0.05)]"
-                    : "text-[#71717a] hover:text-[#e4e4e7] hover:bg-[rgba(255,255,255,0.02)]",
+                    ? "text-[#00ff9f] bg-[#00ff9f]/10"
+                    : "text-[#52525b] hover:text-white hover:bg-[#1a1a1a]",
                 ].join(" ")}
               >
                 {s.icon}
@@ -132,7 +132,7 @@ export default function DocsPage() {
             <select
               value={active}
               onChange={(e) => setActive(e.target.value)}
-              className="w-full bg-[#0a0a0b] border border-[rgba(255,255,255,0.08)] rounded px-3 py-2 text-[#e4e4e7] font-mono text-sm"
+              className="w-full bg-[#111] border border-[#222] rounded px-3 py-2 text-white font-mono text-sm"
             >
               {sections.map((s) => (
                 <option key={s.id} value={s.id}>{s.title}</option>
@@ -148,7 +148,7 @@ export default function DocsPage() {
               transition={{ duration: 0.3 }}
             >
               <div className="flex items-center gap-3 mb-8">
-                <div className="w-10 h-10 rounded-lg bg-[rgba(0,255,65,0.1)] flex items-center justify-center text-[#00ff41]">
+                <div className="w-10 h-10 rounded-lg bg-[#00ff9f]/10 flex items-center justify-center text-[#00ff9f]">
                   {current.icon}
                 </div>
                 <div>
@@ -162,14 +162,14 @@ export default function DocsPage() {
                   <Card key={i} className="group">
                     <div className="flex items-start justify-between">
                       <div>
-                        <h3 className="font-bold text-[#e4e4e7] group-hover:text-[#00ff41] transition-colors">
+                        <h3 className="font-bold text-white group-hover:text-[#00ff9f] transition-colors">
                           {item}
                         </h3>
-                        <p className="text-sm text-[#71717a] mt-1">
+                        <p className="text-sm text-[#52525b] mt-1">
                           Learn about {item.toLowerCase()} in COMPO.
                         </p>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-[#525252] group-hover:text-[#00ff41] transition-colors mt-1 ml-4 shrink-0" />
+                      <ChevronRight className="w-4 h-4 text-[#52525b] group-hover:text-[#00ff9f] transition-colors mt-1 ml-4 shrink-0" />
                     </div>
                   </Card>
                 ))}
@@ -177,34 +177,34 @@ export default function DocsPage() {
 
               {/* Code example */}
               <div className="mt-8">
-                <p className="font-mono text-xs text-[#00ff41] mb-3">$ install --quickstart</p>
-                <div className="bg-[#0a0a0b] border border-[rgba(255,255,255,0.06)] rounded p-4 font-mono text-sm">
-                  <p className="text-[#71717a]"># Clone the repository</p>
+                <p className="font-mono text-xs text-[#00ff9f] mb-3">$ install --quickstart</p>
+                <div className="bg-[#111] border border-[#222] rounded p-4 font-mono text-sm">
+                  <p className="text-[#52525b]"># Clone the repository</p>
                   <p>
-                    <span className="text-[#00ff41]">git</span>{" "}
+                    <span className="text-[#00ff9f]">git</span>{" "}
                     clone https://github.com/compo/compo.git
                   </p>
-                  <p className="mt-2 text-[#71717a]"># Install dependencies</p>
+                  <p className="mt-2 text-[#52525b]"># Install dependencies</p>
                   <p>
-                    <span className="text-[#00ff41]">cd</span> compo &&{" "}
+                    <span className="text-[#00ff9f]">cd</span> compo &&{" "}
                     <span className="text-[#3b82f6]">npm</span> install
                   </p>
-                  <p className="mt-2 text-[#71717a]"># Configure environment</p>
+                  <p className="mt-2 text-[#52525b]"># Configure environment</p>
                   <p>
-                    <span className="text-[#00ff41]">cp</span> .env.example .env
+                    <span className="text-[#00ff9f]">cp</span> .env.example .env
                   </p>
-                  <p className="mt-2 text-[#71717a]"># Launch COMPO</p>
+                  <p className="mt-2 text-[#52525b]"># Launch COMPO</p>
                   <p>
-                    <span className="text-[#00ff41]">npm</span> run dev
+                    <span className="text-[#00ff9f]">npm</span> run dev
                   </p>
-                  <p className="mt-2 text-[#525252]">
+                  <p className="mt-2 text-[#52525b]">
                     Ready at <span className="text-[#3b82f6]">http://localhost:5173</span>
                   </p>
                 </div>
               </div>
 
               {/* Navigation */}
-              <div className="flex items-center justify-between mt-10 pt-6 border-t border-[rgba(255,255,255,0.06)]">
+              <div className="flex items-center justify-between mt-10 pt-6 border-t border-[#222]">
                 {sections.indexOf(current) > 0 && (
                   <Button
                     variant="ghost"
@@ -237,14 +237,14 @@ export default function DocsPage() {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-[rgba(255,255,255,0.06)] py-6 mt-12">
+      <div className="border-t border-[#222] py-6 mt-12">
         <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="font-mono text-xs text-[#525252]">
+          <p className="font-mono text-xs text-[#52525b]">
             (c) 2026 COMPO - Solana Intelligence Terminal
           </p>
           <button
             onClick={() => { window.location.hash = "#/landing"; }}
-            className="font-mono text-xs text-[#525252] hover:text-[#00ff41] transition-colors cursor-pointer"
+            className="font-mono text-xs text-[#52525b] hover:text-[#00ff9f] transition-colors cursor-pointer"
           >
             Back to Home
           </button>

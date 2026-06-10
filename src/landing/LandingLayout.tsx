@@ -196,7 +196,7 @@ const RecentScans: React.FC = () => {
   ];
 
   const verdictColor = (v: string) => {
-    if (v === "SAFE") return { bg: "rgba(0,255,65,0.12)", text: "#00FF41" };
+    if (v === "SAFE") return { bg: "rgba(0,255,159,0.12)", text: "#00ff9f" };
     if (v === "DANGER") return { bg: "rgba(239,68,68,0.12)", text: "#ef4444" };
     return { bg: "rgba(245,158,11,0.12)", text: "#f59e0b" };
   };
@@ -242,7 +242,7 @@ const WatchlistPreview: React.FC = () => {
   ];
 
   const riskColor = (r: number) => {
-    if (r >= 71) return "#00FF41";
+    if (r >= 71) return "#00ff9f";
     if (r >= 41) return "#f59e0b";
     return "#ef4444";
   };

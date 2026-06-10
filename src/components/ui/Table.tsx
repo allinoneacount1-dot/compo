@@ -46,8 +46,8 @@ export function TableHeader({ children, className = "" }: TableHeaderProps) {
     <div
       className={[
         "grid gap-2 items-center",
-        "text-[#71717a] uppercase text-[10px] font-medium tracking-wider",
-        "border-b border-[rgba(255,255,255,0.06)]",
+        "text-[#52525b] uppercase text-[10px] font-medium tracking-wider",
+        "border-b border-[#222]",
         "px-4 py-2",
         className,
       ].join(" ")}
@@ -76,9 +76,9 @@ export function TableRow({ children, onClick, className = "" }: TableRowProps) {
         "grid gap-2 items-center",
         "border-b border-[rgba(255,255,255,0.04)]",
         "px-4 py-3",
-        "text-[#e4e4e7] text-sm",
+        "text-white text-sm",
         "transition-colors duration-150",
-        onClick ? "cursor-pointer hover:bg-[rgba(0,255,65,0.03)]" : "hover:bg-[rgba(0,255,65,0.03)]",
+        onClick ? "cursor-pointer hover:bg-[#1a1a1a]" : "hover:bg-[#1a1a1a]",
         className,
       ].join(" ")}
       style={{ gridTemplateColumns: columns.join(" ") }}

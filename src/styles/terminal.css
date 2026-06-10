@@ -54,14 +54,14 @@
 /* Terminal window */
 .terminal-window {
   background: #111113;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid #222;
   border-radius: 4px;
   overflow: hidden;
 }
 
 .terminal-header {
   background: #19191d;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid #222;
   padding: 8px 12px;
   display: flex;
   align-items: center;
@@ -79,5 +79,5 @@
   font-family: "JetBrains Mono", monospace;
   font-size: 13px;
   line-height: 1.6;
-  color: #e4e4e7;
+  color: #a1a1aa;
 }

@@ -41,13 +41,13 @@ export function ProgressBar({
   return (
     <div className={["w-full", className].join(" ")}>
       {showLabel && (
-        <div className="flex justify-between items-center mb-1.5 text-xs text-[#71717a]">
+        <div className="flex justify-between items-center mb-1.5 text-xs text-[#52525b]">
           <span>{label ?? "Progress"}</span>
           <span className="font-mono">{clamped.toFixed(0)}%</span>
         </div>
       )}
       <div
-        className="w-full rounded-sm bg-[rgba(255,255,255,0.06)] overflow-hidden"
+        className="w-full rounded-sm bg-[#222] overflow-hidden"
         style={{ height: h }}
       >
         <div
