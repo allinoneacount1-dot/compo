@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@theme {
+  /* Core */
+  --color-bg-primary: #030303;
+  --color-bg-secondary: #0a0a0b;
+  --color-bg-surface: #111113;
+  --color-bg-elevated: #19191d;
+
+  /* Borders */
+  --color-border-subtle: rgba(255,255,255,0.04);
+  --color-border-default: rgba(255,255,255,0.08);
+  --color-border-accent: rgba(59,130,246,0.3);
+
+  /* Text */
+  --color-text-primary: #e4e4e7;
+  --color-text-secondary: #71717a;
+  --color-text-muted: #525252;
+  --color-text-accent: #3b82f6;
+
+  /* Semantic */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-info: #06b6d4;
+
+  /* Terminal */
+  --color-terminal: #00ff41;
+  --color-terminal-dim: rgba(0,255,65,0.15);
+
+  /* Fonts */
+  --font-display: "JetBrains Mono", "SF Mono", monospace;
+  --font-body: "Inter", -apple-system, sans-serif;
+  --font-data: "JetBrains Mono", monospace;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+
+body {
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: rgba(59,130,246,0.3);
+  color: white;
+}
