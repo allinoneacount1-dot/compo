@@ -23,6 +23,10 @@ import {
   Wallet,
   Download,
   Zap,
+  Pause,
+  Play,
+  Star,
+  SlidersHorizontal,
 } from "lucide-react";
 import { DashboardLayout } from "../../components/layout/DashboardLayout";
 import { Card } from "../../components/ui/Card";
@@ -593,6 +597,13 @@ export default function WhaleRadar() {
   const [selectedWallet, setSelectedWallet] = useState<WalletProfile | null>(null);
   const [liveTx] = useState<LiveTx[]>(MOCK_LIVE_TX);
 
+  // Advanced filter state
+  const [minBuySOL, setMinBuySOL] = useState<string>("");
+  const [watchlistOnly, setWatchlistOnly] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [feedSpeed, setFeedSpeed] = useState<"realtime" | "fast" | "slow">("realtime");
+  const [showFilters, setShowFilters] = useState(false);
+
   const handleWalletClick = useCallback((wallet: string) => {
     setSelectedWallet({
       ...MOCK_WALLET_PROFILE,
@@ -647,7 +658,7 @@ export default function WhaleRadar() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 space-y-4 max-w-[1400px]">
+      <div className="p-3 space-y-3 max-w-[1400px]">
         {/* ── 1. Stats Bar ── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {stats.map((stat) => (
@@ -666,21 +677,69 @@ export default function WhaleRadar() {
         </div>
 
         {/* ── 2. Main Content: Live Feed + Top Movers ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-3">
           {/* ── Live Feed (60%) ── */}
           <div className="lg:col-span-3">
             <Card className="h-full">
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <LiveDot />
+                  {!isPaused && <LiveDot />}
+                  {isPaused && <span className="w-2 h-2 rounded-full bg-[#f59e0b]" />}
                   <span className="font-mono text-[10px] text-[#525252] uppercase tracking-wider">
                     Live Transaction Stream
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
+                  {/* Filter Toggle */}
+                  <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className={cn(
+                      "flex items-center gap-1 px-2 py-1 rounded border font-mono text-[9px] uppercase tracking-wider transition-colors",
+                      showFilters
+                        ? "border-[rgba(0,255,65,0.3)] text-[#00ff41] bg-[rgba(0,255,65,0.05)]"
+                        : "border-[rgba(255,255,255,0.08)] text-[#525252] hover:text-[#71717a]"
+                    )}
+                  >
+                    <SlidersHorizontal className="w-3 h-3" />
+                    Filters
+                  </button>
+
+                  {/* Speed Control */}
+                  <div className="flex items-center gap-0.5 border border-[rgba(255,255,255,0.08)] rounded">
+                    {(["realtime", "fast", "slow"] as const).map((speed) => (
+                      <button
+                        key={speed}
+                        onClick={() => setFeedSpeed(speed)}
+                        className={cn(
+                          "px-1.5 py-1 font-mono text-[8px] uppercase tracking-wider transition-colors",
+                          feedSpeed === speed
+                            ? "text-[#00ff41]"
+                            : "text-[#525252] hover:text-[#71717a]",
+                          speed !== "realtime" && "border-l border-[rgba(255,255,255,0.06)]"
+                        )}
+                      >
+                        {speed === "realtime" ? "RT" : speed === "fast" ? "1x" : "0.5x"}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Pause/Play */}
+                  <button
+                    onClick={() => setIsPaused(!isPaused)}
+                    className={cn(
+                      "flex items-center justify-center w-7 h-7 rounded border transition-colors",
+                      isPaused
+                        ? "border-[rgba(245,158,11,0.3)] text-[#f59e0b] bg-[rgba(245,158,11,0.05)]"
+                        : "border-[rgba(255,255,255,0.08)] text-[#525252] hover:text-[#71717a]"
+                    )}
+                    title={isPaused ? "Resume feed" : "Pause feed"}
+                  >
+                    {isPaused ? <Play className="w-3 h-3" /> : <Pause className="w-3 h-3" />}
+                  </button>
+
                   <button
                     onClick={handleExportCSV}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[rgba(59,130,246,0.12)] border border-[rgba(59,130,246,0.2)] text-[#3b82f6] hover:bg-[rgba(59,130,246,0.2)] transition-colors"
+                    className="flex items-center gap-1 px-2 py-1 rounded bg-[rgba(59,130,246,0.12)] border border-[rgba(59,130,246,0.2)] text-[#3b82f6] hover:bg-[rgba(59,130,246,0.2)] transition-colors"
                   >
                     <Download className="w-3 h-3" />
                     <span className="font-mono text-[9px] uppercase tracking-wider">
@@ -688,15 +747,80 @@ export default function WhaleRadar() {
                     </span>
                   </button>
                   <div className="flex items-center gap-1.5">
-                    <span className="font-mono text-[10px] text-[#00ff41] terminal-blink font-bold">
-                      LIVE
+                    <span className={cn(
+                      "font-mono text-[10px] terminal-blink font-bold",
+                      isPaused ? "text-[#f59e0b]" : "text-[#00ff41]"
+                    )}>
+                      {isPaused ? "PAUSED" : "LIVE"}
                     </span>
                   </div>
                 </div>
               </div>
 
+              {/* Advanced Filters Panel */}
+              {showFilters && (
+                <div className="mb-3 p-3 rounded border border-[rgba(255,255,255,0.06)] bg-[#0a0a0b]">
+                  <div className="flex flex-wrap items-end gap-3">
+                    {/* Min Buy Amount */}
+                    <div>
+                      <label className="font-mono text-[9px] text-[#525252] uppercase tracking-wider mb-1 block">
+                        Min Buy (SOL)
+                      </label>
+                      <div className="flex items-center gap-1.5">
+                        <input
+                          type="number"
+                          min="0"
+                          step="1"
+                          value={minBuySOL}
+                          onChange={(e) => setMinBuySOL(e.target.value)}
+                          placeholder="e.g. 100"
+                          className="w-24 h-7 px-2 rounded bg-[#111113] border border-[rgba(255,255,255,0.08)] text-[#e4e4e7] font-mono text-[11px] focus:outline-none focus:border-[#00ff41]"
+                        />
+                        {minBuySOL && (
+                          <button
+                            onClick={() => setMinBuySOL("")}
+                            className="text-[#525252] hover:text-[#71717a] transition-colors"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Watchlist Only Toggle */}
+                    <div>
+                      <label className="font-mono text-[9px] text-[#525252] uppercase tracking-wider mb-1 block">
+                        Wallet Filter
+                      </label>
+                      <button
+                        onClick={() => setWatchlistOnly(!watchlistOnly)}
+                        className={cn(
+                          "flex items-center gap-1.5 h-7 px-2.5 rounded border font-mono text-[10px] uppercase tracking-wider transition-colors",
+                          watchlistOnly
+                            ? "border-[rgba(245,158,11,0.3)] text-[#f59e0b] bg-[rgba(245,158,11,0.05)]"
+                            : "border-[rgba(255,255,255,0.08)] text-[#525252] hover:text-[#71717a]"
+                        )}
+                      >
+                        <Star className="w-3 h-3" />
+                        Watchlist Only
+                      </button>
+                    </div>
+
+                    {/* Active filter indicator */}
+                    {(minBuySOL || watchlistOnly) && (
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#00ff41] animate-pulse" />
+                        <span className="font-mono text-[9px] text-[#00ff41]">
+                          {[minBuySOL && `Buy > ${minBuySOL} SOL`, watchlistOnly && "Watchlist"].filter(Boolean).join(" · ")}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-0 -mx-4">
-                <div className="grid grid-cols-[36px_70px_1fr_80px_70px_90px_80px_40px] gap-1 px-4 py-1.5 border-b border-[rgba(255,255,255,0.06)]">
+                <div className="grid grid-cols-[36px_70px_1fr_80px_70px_90px_80px_40px] gap-1 px-4 py-1 border-b border-[rgba(255,255,255,0.06)]">
                   {["", "Time", "Wallet", "Action", "Token", "Amount", "Tx", ""].map(
                     (h) => (
                       <span
@@ -709,7 +833,7 @@ export default function WhaleRadar() {
                   )}
                 </div>
 
-                <div className="max-h-[420px] overflow-y-auto">
+                <div className="max-h-[480px] overflow-y-auto">
                   <AnimatePresence initial={false}>
                     {liveTx.map((tx, index) => (
                       <motion.div
@@ -720,7 +844,7 @@ export default function WhaleRadar() {
                           duration: 0.3,
                           delay: index * 0.05,
                         }}
-                        className="grid grid-cols-[36px_70px_1fr_80px_70px_90px_80px_40px] gap-1 px-4 py-2 border-b border-[rgba(255,255,255,0.03)] hover:bg-[rgba(0,255,65,0.03)] transition-colors duration-150 items-center"
+                        className="grid grid-cols-[36px_70px_1fr_80px_70px_90px_80px_40px] gap-1 px-4 py-1.5 border-b border-[rgba(255,255,255,0.03)] hover:bg-[rgba(0,255,65,0.03)] transition-colors duration-150 items-center"
                       >
                         {/* Live dot */}
                         <div className="flex justify-center">

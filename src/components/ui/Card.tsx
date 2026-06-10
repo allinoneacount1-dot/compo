@@ -5,19 +5,20 @@ interface CardProps {
   className?: string;
   onClick?: (e: MouseEvent<HTMLDivElement>) => void;
   hoverable?: boolean;
+  compact?: boolean;
 }
 
-export function Card({ children, className = "", onClick, hoverable = false }: CardProps) {
-  const hoverClasses = hoverable
-    ? "hover:border-[rgba(0,255,65,0.15)] hover:bg-[rgba(0,255,65,0.02)] cursor-pointer transition-all duration-150"
-    : "";
-
+export function Card({ children, className = "", onClick, hoverable = false, compact = false }: CardProps) {
   return (
     <div
       onClick={onClick}
       className={[
-        "bg-[#0a0a0b] border border-[rgba(255,255,255,0.06)] rounded p-3",
-        hoverClasses,
+        "bg-[var(--color-bg-secondary)] border border-[var(--color-border-default)] rounded",
+        compact ? "p-3" : "p-4",
+        "shadow-[var(--shadow-card)]",
+        hoverable
+          ? "hover:border-[var(--color-border-accent)] hover:bg-[var(--color-bg-hover)] hover:shadow-[var(--shadow-glow-green)] cursor-pointer transition-all duration-150"
+          : "transition-all duration-150",
         className,
       ].join(" ")}
     >

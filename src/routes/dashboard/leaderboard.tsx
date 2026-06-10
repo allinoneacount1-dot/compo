@@ -19,6 +19,7 @@ import {
 import { DashboardLayout } from "../../components/layout/DashboardLayout";
 import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
+import { cn } from "../../lib/utils/cn";
 
 // ─── Types ───
 
@@ -965,7 +966,7 @@ export default function LeaderboardPage() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 space-y-4">
+      <div className="p-3 space-y-3">
         {/* ── Header ── */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -1044,6 +1045,77 @@ export default function LeaderboardPage() {
           </div>
         </div>
 
+        {/* ── Your Rank Card (Prominent) ── */}
+        {yourRank && (
+          <Card className="border-[rgba(59,130,246,0.2)] bg-[rgba(59,130,246,0.03)]">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#3b82f6] animate-pulse" />
+              <span className="font-mono text-[10px] text-[#3b82f6] uppercase tracking-wider font-bold">
+                Your Rank
+              </span>
+            </div>
+
+            <div className="flex items-center gap-4">
+              {/* Rank Number */}
+              <div className="flex flex-col items-center justify-center w-16 h-16 rounded-lg bg-[rgba(59,130,246,0.1)] border border-[rgba(59,130,246,0.2)]">
+                <span className="font-mono text-2xl font-bold text-[#3b82f6]">
+                  #{yourRank.rank}
+                </span>
+              </div>
+
+              {/* Trader Info */}
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <AvatarPlaceholder name={yourRank.avatar} size="md" />
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-sm font-bold text-[#3b82f6] truncate">
+                      {yourRank.name}
+                    </span>
+                    <Badge variant="info" size="sm">YOU</Badge>
+                  </div>
+                  <div className="flex gap-1 mt-0.5">
+                    {yourRank.badges.map((badge) => (
+                      <span
+                        key={badge}
+                        className="text-xs"
+                        title={badgeConfig[badge]?.label}
+                      >
+                        {badge}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Stats */}
+              <div className="hidden sm:grid grid-cols-4 gap-4">
+                <div className="text-center">
+                  <p className="font-mono text-[9px] text-[#525252] uppercase tracking-wider">Win Rate</p>
+                  <p className="font-mono text-sm font-bold text-[#00ff41]">{yourRank.winRate}%</p>
+                </div>
+                <div className="text-center">
+                  <p className="font-mono text-[9px] text-[#525252] uppercase tracking-wider">Trades</p>
+                  <p className="font-mono text-sm font-bold text-[#e4e4e7]">{yourRank.totalTrades}</p>
+                </div>
+                <div className="text-center">
+                  <p className="font-mono text-[9px] text-[#525252] uppercase tracking-wider">P&L 24h</p>
+                  <p className={cn(
+                    "font-mono text-sm font-bold flex items-center justify-center gap-0.5",
+                    yourRank.pnl24h >= 0 ? "text-[#10b981]" : "text-[#ef4444]"
+                  )}>
+                    {yourRank.pnl24h >= 0 ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                    {yourRank.pnl24h >= 0 ? "+" : ""}{yourRank.pnl24h}%
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="font-mono text-[9px] text-[#525252] uppercase tracking-wider">Volume</p>
+                  <p className="font-mono text-sm font-bold text-[#3b82f6]">{yourRank.volume}</p>
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
+
         {/* ── Top 3 Podium ── */}
         {top3.length >= 3 && (
           <div className="grid grid-cols-3 gap-3">
@@ -1121,105 +1193,6 @@ export default function LeaderboardPage() {
             </div>
           </div>
         </Card>
-
-        {/* ── Your Rank Card ── */}
-        {yourRank && (
-          <Card>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#3b82f6] animate-pulse" />
-              <span className="font-mono text-[10px] text-[#525252] uppercase tracking-wider">
-                Your Position
-              </span>
-            </div>
-
-            <div className="grid grid-cols-[50px_1fr_80px_90px_90px_80px_100px_100px] gap-2 px-3 py-3 rounded-md bg-[rgba(59,130,246,0.06)] border border-[rgba(59,130,246,0.15)] min-w-[700px] overflow-x-auto">
-              {/* Rank */}
-              <div className="flex items-center">
-                <span className="font-mono text-sm font-bold text-[#3b82f6]">
-                  #{yourRank.rank}
-                </span>
-              </div>
-
-              {/* Trader */}
-              <div className="flex items-center gap-2 min-w-0">
-                <AvatarPlaceholder name={yourRank.avatar} size="sm" />
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-mono text-xs font-bold text-[#3b82f6] truncate">
-                      {yourRank.name}
-                    </span>
-                    <Badge variant="info" size="sm">
-                      YOU
-                    </Badge>
-                  </div>
-                  <div className="flex gap-1 mt-0.5">
-                    {yourRank.badges.map((badge) => (
-                      <span
-                        key={badge}
-                        className="text-xs"
-                        title={badgeConfig[badge]?.label}
-                      >
-                        {badge}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Win Rate */}
-              <div className="flex items-center">
-                <span className="font-mono text-xs text-[#00ff41]">
-                  {yourRank.winRate}%
-                </span>
-              </div>
-
-              {/* Trades */}
-              <div className="flex items-center">
-                <span className="font-mono text-xs text-[#e4e4e7]">
-                  {yourRank.totalTrades}
-                </span>
-              </div>
-
-              {/* P&L */}
-              <div className="flex items-center">
-                <span
-                  className={`font-mono text-xs font-bold flex items-center gap-0.5 ${
-                    yourRank.pnl24h >= 0 ? "text-[#10b981]" : "text-[#ef4444]"
-                  }`}
-                >
-                  {yourRank.pnl24h >= 0 ? (
-                    <ChevronUp className="w-3 h-3" />
-                  ) : (
-                    <ChevronDown className="w-3 h-3" />
-                  )}
-                  {yourRank.pnl24h >= 0 ? "+" : ""}
-                  {yourRank.pnl24h}%
-                </span>
-              </div>
-
-              {/* Volume */}
-              <div className="flex items-center">
-                <span className="font-mono text-xs text-[#3b82f6]">
-                  {yourRank.volume}
-                </span>
-              </div>
-
-              {/* Avg Position */}
-              <div className="flex items-center">
-                <span className="font-mono text-xs text-[#71717a]">
-                  {yourRank.avgPosition}
-                </span>
-              </div>
-
-              {/* Favorite Token */}
-              <div className="flex items-center">
-                <span className="font-mono text-xs text-[#00ff41] font-bold">
-                  {yourRank.favoriteToken}
-                </span>
-              </div>
-            </div>
-          </Card>
-        )}
 
         {/* ── Achievement Badges Legend ── */}
         <Card>

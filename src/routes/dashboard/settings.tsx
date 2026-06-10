@@ -52,7 +52,7 @@ interface GeneralSettings {
   dateFormat: string;
   defaultCurrency: string;
   autoRefreshInterval: number;
-  compactMode: boolean;
+  densityMode: "standard" | "compact";
 }
 
 interface WalletSettings {
@@ -402,7 +402,7 @@ export default function SettingsPage() {
     dateFormat: "MM/DD/YYYY",
     defaultCurrency: "USD",
     autoRefreshInterval: 30,
-    compactMode: false,
+    densityMode: "standard" as const,
   });
 
   // Wallet state
@@ -551,7 +551,7 @@ export default function SettingsPage() {
           dateFormat: "MM/DD/YYYY",
           defaultCurrency: "USD",
           autoRefreshInterval: 30,
-          compactMode: false,
+          densityMode: "standard",
         });
         setWallet({
           connectedWallets: [],
@@ -775,14 +775,14 @@ export default function SettingsPage() {
         <FormRow label="Compact Mode">
           <div className="flex items-center gap-2">
             <span className="font-mono text-[10px] text-[#525252]">
-              {general.compactMode ? "Enabled" : "Disabled"}
+              {general.densityMode === "compact" ? "Enabled" : "Disabled"}
             </span>
             <Toggle
-              enabled={general.compactMode}
+              enabled={general.densityMode === "compact"}
               onToggle={() =>
                 setGeneral((prev) => ({
                   ...prev,
-                  compactMode: !prev.compactMode,
+                  densityMode: prev.densityMode === "compact" ? "standard" : "compact",
                 }))
               }
             />

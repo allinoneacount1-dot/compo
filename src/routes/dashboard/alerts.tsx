@@ -27,6 +27,9 @@ import {
   History,
   ChevronUp,
   ChevronDown,
+  Sparkles,
+  Brain,
+  Wand2,
 } from "lucide-react";
 import { DashboardLayout } from "../../components/layout/DashboardLayout";
 import { Card } from "../../components/ui/Card";
@@ -416,7 +419,7 @@ export default function AlertsPage() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 space-y-5 max-w-[1280px]">
+      <div className="p-3 space-y-3 max-w-[1280px]">
         {/* ═══════════════════════════════════════════════════════════════
             PAGE HEADER
         ═══════════════════════════════════════════════════════════════ */}
@@ -684,6 +687,96 @@ export default function AlertsPage() {
             </div>
           </Card>
         )}
+
+        {/* ═══════════════════════════════════════════════════════════════
+            2.5. AI-SUGGESTED RULES
+        ═══════════════════════════════════════════════════════════════ */}
+        <Card className="border-[rgba(168,85,247,0.15)]">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Brain className="w-4 h-4 text-[#a855f7]" />
+              <h2 className="font-mono text-sm font-bold text-[#e4e4e7] uppercase tracking-wider">
+                AI-Suggested Rules
+              </h2>
+              <Badge variant="warning" size="sm">BETA</Badge>
+            </div>
+            <button className="flex items-center gap-1 text-[#a855f7] hover:text-[#c084fc] transition-colors font-mono text-[10px]">
+              <Sparkles className="w-3 h-3" />
+              Refresh Suggestions
+            </button>
+          </div>
+          <p className="font-mono text-[10px] text-[#525252] mb-3">
+            Based on your watchlist, recent whale activity, and market patterns
+          </p>
+
+          <div className="space-y-2">
+            {[
+              {
+                icon: "🐋",
+                title: "Whale Accumulation Detected",
+                desc: "3 wallets >$100K bought WIF in the last hour. Set a price alert?",
+                action: "Whale Move > 100 SOL",
+                token: "WIF",
+                confidence: 92,
+              },
+              {
+                icon: "📊",
+                title: "Volume Spike Pattern",
+                desc: "BONK volume is 3.2x the 7-day average. Consider a volume spike alert.",
+                action: "Volume > 2x avg",
+                token: "BONK",
+                confidence: 87,
+              },
+              {
+                icon: "⚠️",
+                title: "Rug Risk Elevated",
+                desc: "New token MOODENG has 3 risk flags. Set a safety scanner alert?",
+                action: "Risk Score < 40",
+                token: "MOODENG",
+                confidence: 78,
+              },
+            ].map((suggestion, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-3 p-2.5 rounded border border-[rgba(168,85,247,0.08)] bg-[rgba(168,85,247,0.02)] hover:border-[rgba(168,85,247,0.15)] transition-colors"
+              >
+                <span className="text-lg flex-shrink-0">{suggestion.icon}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs font-bold text-[#e4e4e7]">
+                      {suggestion.title}
+                    </span>
+                    <span className={cn(
+                      "font-mono text-[9px] px-1.5 py-0.5 rounded",
+                      suggestion.confidence >= 90
+                        ? "bg-[rgba(16,185,129,0.1)] text-[#10b981]"
+                        : suggestion.confidence >= 80
+                          ? "bg-[rgba(245,158,11,0.1)] text-[#f59e0b]"
+                          : "bg-[rgba(239,68,68,0.1)] text-[#ef4444]"
+                    )}>
+                      {suggestion.confidence}% confidence
+                    </span>
+                  </div>
+                  <p className="font-mono text-[10px] text-[#71717a] mt-0.5">
+                    {suggestion.desc}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <span className="font-mono text-[10px] text-[#a855f7]">
+                    {suggestion.action}
+                  </span>
+                  <button
+                    className="flex items-center gap-1 px-2 py-1 rounded border border-[rgba(168,85,247,0.2)] text-[#a855f7] hover:bg-[rgba(168,85,247,0.1)] transition-colors font-mono text-[9px] uppercase tracking-wider"
+                    title="Accept suggestion"
+                  >
+                    <Wand2 className="w-3 h-3" />
+                    Add
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
 
         {/* ═══════════════════════════════════════════════════════════════
             3. ACTIVE ALERTS LIST

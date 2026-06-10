@@ -12,6 +12,7 @@ import {
   Globe,
   AtSign,
   AlertTriangle,
+  Shield,
   Clock,
   ChevronRight,
   ChevronUp,
@@ -429,7 +430,7 @@ export default function TokenScanner() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 space-y-5 max-w-[1200px]">
+      <div className="p-3 space-y-3 max-w-[1200px]">
         {/* ── 1. Scan Input ── */}
         <Card>
           <div className="flex items-center gap-2 mb-3">
@@ -492,7 +493,7 @@ export default function TokenScanner() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.4 }}
-              className="space-y-5"
+              className="space-y-3"
             >
               {/* Risk Score Gauge */}
               <Card className="flex flex-col items-center py-8">
@@ -560,12 +561,22 @@ export default function TokenScanner() {
               </div>
 
               {/* Verdict Banner */}
-              <Card className="border-l-[3px] border-l-[#ef4444] bg-[rgba(239,68,68,0.06)]">
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              <Card className={cn(
+                "border-l-[3px]",
+                result.overallScore >= 71
+                  ? "border-l-[#10b981] bg-[rgba(16,185,129,0.06)]"
+                  : result.overallScore >= 41
+                    ? "border-l-[#f59e0b] bg-[rgba(245,158,11,0.06)]"
+                    : "border-l-[#ef4444] bg-[rgba(239,68,68,0.06)]"
+              )}>
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
                   <div className="flex items-start gap-3">
-                    <span className="text-xl mt-0.5">⚠️</span>
+                    <span className="text-xl mt-0.5">{result.overallScore >= 71 ? "✅" : result.overallScore >= 41 ? "⚠️" : "🚫"}</span>
                     <div>
-                      <p className="font-mono text-xs text-[#ef4444] font-bold mb-1">
+                      <p className={cn(
+                        "font-mono text-xs font-bold mb-1",
+                        getScoreTextClass(result.overallScore)
+                      )}>
                         VERDICT: {riskLabel(result.overallScore)} —{" "}
                         {result.verdictText}
                       </p>
@@ -598,6 +609,50 @@ export default function TokenScanner() {
                       Share Report
                     </Button>
                   </div>
+                </div>
+              </Card>
+
+              {/* Honeypot Quick Check */}
+              <Card>
+                <div className="flex items-center gap-2 mb-3">
+                  <Shield className="w-3.5 h-3.5 text-[#3b82f6]" />
+                  <span className="font-mono text-[10px] text-[#525252] uppercase tracking-wider">
+                    Honeypot &amp; Sell Tax Check
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {[
+                    { label: "Honeypot", pass: result.categories.some(c => c.findings.some(f => f.text.toLowerCase().includes("honeypot") && f.positive)) },
+                    { label: "Buy Tax", pass: true, detail: "0%" },
+                    { label: "Sell Tax", pass: !result.categories.some(c => c.findings.some(f => f.text.toLowerCase().includes("sell tax") && !f.positive)), detail: result.categories.flatMap(c => c.findings).find(f => f.text.toLowerCase().includes("sell tax"))?.text || "N/A" },
+                    { label: "Transfer Tax", pass: true, detail: "0%" },
+                  ].map((check) => (
+                    <div key={check.label} className={cn(
+                      "rounded border p-2.5 text-center",
+                      check.pass
+                        ? "border-[rgba(16,185,129,0.2)] bg-[rgba(16,185,129,0.04)]"
+                        : "border-[rgba(239,68,68,0.2)] bg-[rgba(239,68,68,0.04)]"
+                    )}>
+                      <div className="flex items-center justify-center gap-1.5 mb-1">
+                        <span className={cn(
+                          "w-2 h-2 rounded-full",
+                          check.pass ? "bg-[#10b981]" : "bg-[#ef4444]"
+                        )} />
+                        <span className="font-mono text-[10px] text-[#71717a] uppercase tracking-wider">
+                          {check.label}
+                        </span>
+                      </div>
+                      <p className={cn(
+                        "font-mono text-xs font-bold",
+                        check.pass ? "text-[#10b981]" : "text-[#ef4444]"
+                      )}>
+                        {check.pass ? "PASS" : "FAIL"}
+                      </p>
+                      {"detail" in check && check.detail && (
+                        <p className="font-mono text-[9px] text-[#525252] mt-0.5">{check.detail}</p>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </Card>
 

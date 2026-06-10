@@ -4,11 +4,11 @@ type BadgeVariant = "success" | "warning" | "danger" | "info" | "neutral";
 type BadgeSize = "sm" | "md";
 
 const variantStyles: Record<BadgeVariant, string> = {
-  success: "text-[#10b981] bg-[rgba(16,185,129,0.15)]",
-  warning: "text-[#f59e0b] bg-[rgba(245,158,11,0.15)]",
-  danger: "text-[#ef4444] bg-[rgba(239,68,68,0.15)]",
-  info: "text-[#06b6d4] bg-[rgba(6,182,212,0.15)]",
-  neutral: "text-[#71717a] bg-[rgba(113,113,122,0.15)]",
+  success: "text-[#00FF9F] bg-[rgba(0,255,159,0.12)] border border-[rgba(0,255,159,0.2)]",
+  warning: "text-[#FFB800] bg-[rgba(255,184,0,0.12)] border border-[rgba(255,184,0,0.2)]",
+  danger: "text-[#FF3B5C] bg-[rgba(255,59,92,0.12)] border border-[rgba(255,59,92,0.2)]",
+  info: "text-[#3B82F6] bg-[rgba(59,130,246,0.12)] border border-[rgba(59,130,246,0.2)]",
+  neutral: "text-[#A0A0A0] bg-[rgba(160,160,160,0.1)] border border-[rgba(160,160,160,0.15)]",
 };
 
 const sizeStyles: Record<BadgeSize, string> = {

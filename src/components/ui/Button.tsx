@@ -5,11 +5,14 @@ type ButtonVariant = "primary" | "secondary" | "danger" | "ghost";
 type ButtonSize = "sm" | "md" | "lg";
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary: "bg-[#3b82f6] text-white hover:bg-[#2563eb] active:bg-[#1d4ed8]",
+  primary:
+    "bg-[#00FF9F] text-[#0D0D0D] hover:bg-[#00E08B] active:bg-[#00C87A] shadow-[var(--shadow-glow-green)]",
   secondary:
-    "bg-transparent border border-[rgba(255,255,255,0.1)] text-[#e4e4e7] hover:border-[rgba(255,255,255,0.2)] hover:bg-[rgba(255,255,255,0.03)]",
-  danger: "bg-[#ef4444] text-white hover:bg-[#dc2626] active:bg-[#b91c1c]",
-  ghost: "bg-transparent text-[#71717a] hover:text-[#a1a1aa] hover:bg-[rgba(255,255,255,0.03)]",
+    "bg-transparent border border-[var(--color-border-default)] text-[var(--color-text-primary)] hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]",
+  danger:
+    "bg-[#FF3B5C] text-white hover:bg-[#E03352] active:bg-[#C02B47] shadow-[var(--shadow-glow-red)]",
+  ghost:
+    "bg-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)]",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -42,8 +45,8 @@ export function Button({
     <button
       className={[
         "inline-flex items-center justify-center gap-2 rounded font-medium",
-        "transition-colors duration-150",
-        "focus:outline-none focus:ring-2 focus:ring-[#3b82f6]/40 focus:ring-offset-1 focus:ring-offset-[#0a0a0b]",
+        "transition-all duration-150",
+        "focus:outline-none focus:ring-2 focus:ring-[rgba(0,255,159,0.4)] focus:ring-offset-1 focus:ring-offset-[var(--color-bg-primary)]",
         "disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
         variantStyles[variant],
         sizeStyles[size],
