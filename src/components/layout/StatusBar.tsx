@@ -14,7 +14,7 @@ export function StatusBar() {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-50 h-7 flex items-center gap-4 px-6"
+      className="fixed bottom-0 left-0 right-0 z-50 h-7 flex items-center gap-4 px-6 md:ml-[260px]"
       style={{ background: "#111111", borderTop: "1px solid #222" }}
     >
       <span className="flex items-center gap-1.5">

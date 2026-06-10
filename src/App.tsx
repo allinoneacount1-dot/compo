@@ -12,9 +12,10 @@ import PortfolioPage from "./routes/dashboard/portfolio";
 import AlertsPage from "./routes/dashboard/alerts";
 import LeaderboardPage from "./routes/dashboard/leaderboard";
 import SettingsPage from "./routes/dashboard/settings";
+import OnChainPage from "./routes/dashboard/onchain";
 import DocsPage from "./routes/docs";
 
-type Page = "booting" | "landing" | "docs" | "dashboard" | "scanner" | "whales" | "sniper" | "portfolio" | "alerts" | "leaderboard" | "settings";
+type Page = "booting" | "landing" | "docs" | "dashboard" | "scanner" | "whales" | "sniper" | "portfolio" | "alerts" | "leaderboard" | "onchain" | "settings";
 
 function getInitialPage(): Page {
   if (typeof window === "undefined") return "booting";
@@ -25,6 +26,7 @@ function getInitialPage(): Page {
   if (hash.startsWith("/portfolio")) return "portfolio";
   if (hash.startsWith("/alerts")) return "alerts";
   if (hash.startsWith("/leaderboard")) return "leaderboard";
+  if (hash.startsWith("/onchain")) return "onchain";
   if (hash.startsWith("/settings")) return "settings";
   if (hash.startsWith("/docs")) return "docs";
   if (hash.startsWith("/dashboard")) return "dashboard";
@@ -41,6 +43,7 @@ function getPageTitle(page: Page): string {
     case "alerts": return "Alerts";
     case "leaderboard": return "Leaderboard";
     case "settings": return "Settings";
+    case "onchain": return "On-Chain Intel";
     default: return "Overview";
   }
 }
@@ -117,6 +120,9 @@ function App() {
       break;
     case "settings":
       content = <SettingsPage />;
+      break;
+    case "onchain":
+      content = <OnChainPage />;
       break;
     default:
       content = <DashboardOverview />;

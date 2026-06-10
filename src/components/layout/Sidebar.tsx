@@ -2,7 +2,7 @@
 
 import { type ReactNode, useState, useEffect, useCallback } from "react";
 import {
-  LayoutDashboard, Search, Radar, Zap, Wallet, Bell, Trophy, Settings,
+  LayoutDashboard, Search, Radar, Zap, Wallet, Bell, Trophy, Settings, Activity,
   ChevronLeft, ChevronRight,
 } from "lucide-react";
 
@@ -21,6 +21,7 @@ const navItems: NavItem[] = [
   { label: "Portfolio", icon: <Wallet className="w-[18px] h-[18px]" />, route: "#/portfolio" },
   { label: "Alerts", icon: <Bell className="w-[18px] h-[18px]" />, route: "#/alerts", badge: 3 },
   { label: "Leaderboard", icon: <Trophy className="w-[18px] h-[18px]" />, route: "#/leaderboard" },
+  { label: "On-Chain", icon: <Activity className="w-[18px] h-[18px]" />, route: "#/onchain" },
   { label: "Settings", icon: <Settings className="w-[18px] h-[18px]" />, route: "#/settings" },
 ];
 
