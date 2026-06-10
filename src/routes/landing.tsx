@@ -60,14 +60,14 @@ function Navbar() {
 // ─── Hero ───
 function Hero() {
   return (
-    <section id="top" className="relative flex flex-col justify-center pt-16 pb-8 overflow-hidden" style={{ minHeight: 420 }}>
+    <section id="top" className="relative flex flex-col justify-center pt-12 pb-6 overflow-hidden" style={{ minHeight: 380 }}>
       <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
       <div className="absolute inset-0 opacity-[0.015] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")` }} />
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[rgba(0,255,159,0.02)] blur-[120px]" />
 
       <div className="relative max-w-[1600px] mx-auto px-6 w-full">
         {/* Alpha Score Bar */}
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 mb-6 py-3 border-b border-[#222]">
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mb-4 py-2 border-b border-[#222]">
           <div className="flex items-center gap-2">
             <span className="font-mono text-[10px] text-[#52525b] uppercase tracking-wider">Alpha Score</span>
             <span className="font-mono text-lg font-bold text-[#00ff9f]">{ALPHA_SCORE.score}</span>
@@ -93,7 +93,7 @@ function Hero() {
           </div>
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-8 items-center">
+        <div className="grid lg:grid-cols-2 gap-6 items-center">
           {/* Left: Copy */}
           <div>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }} className="mb-4">
@@ -106,7 +106,7 @@ function Hero() {
               <span className="text-[#00ff9f] font-mono">EVERYONE</span>
             </motion.h1>
             <motion.p initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.4 }} className="text-base sm:text-lg font-mono text-[#52525b] mb-2 tracking-wider uppercase">{COMPO.subhead}</motion.p>
-            <motion.p initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.4 }} className="text-[#52525b] mb-6 max-w-md text-sm leading-relaxed">Track whales. Detect rugs. Execute faster. The command center for Solana market intelligence.</motion.p>
+            <motion.p initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.4 }} className="text-[#52525b] mb-4 max-w-md text-sm leading-relaxed">Track whales. Detect rugs. Execute faster. The command center for Solana market intelligence.</motion.p>
             <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6, duration: 0.4 }} className="flex flex-wrap gap-3">
               <Button size="lg" icon={<ArrowRight className="w-4 h-4" />} onClick={() => navTo("#/dashboard")}>ENTER TERMINAL</Button>
               <Button variant="ghost" size="lg" onClick={() => navTo("#/docs")}>READ DOCS</Button>
@@ -191,15 +191,15 @@ function Modules() {
   ];
 
   return (
-    <Section id="modules" className="py-16 px-6">
+    <Section id="modules" className="py-10 px-6">
       <div className="max-w-[1600px] mx-auto">
-        <div className="flex items-center gap-2 mb-8">
+        <div className="flex items-center gap-2 mb-4">
           <Activity className="w-4 h-4 text-[#00ff9f]" />
           <span className="font-mono text-xs text-[#00ff9f] uppercase tracking-wider">Terminal Modules</span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {modules.map((m) => (
-            <div key={m.eyebrow} className="bg-[#161616] border border-[#222] rounded-xl p-5 hover:border-[#00ff9f]/30 transition-colors group">
+            <div key={m.eyebrow} className="bg-[#161616] border border-[#222] rounded-xl p-4 hover:border-[#00ff9f]/30 transition-colors group">
               <div className="flex items-center justify-between mb-3">
                 <span className="font-mono text-[10px] text-[#00ff9f] uppercase tracking-wider">{m.eyebrow}</span>
                 {m.icon}
@@ -224,7 +224,7 @@ function Footer() {
   return (
     <footer className="py-8 px-6 border-t border-[#222]">
       <div className="max-w-[1600px] mx-auto">
-        <div className="flex flex-wrap gap-12 mb-6">
+        <div className="flex flex-wrap gap-8 mb-4">
           <div>
             <div className="font-mono text-sm text-[#00ff9f] mb-1">&gt;_ COMPO_</div>
             <div className="font-mono text-[10px] text-[#52525b]">Solana Intelligence Terminal</div>

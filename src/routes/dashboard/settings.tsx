@@ -100,9 +100,9 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="p-6 max-w-[1000px]">
+    <div className="p-4 max-w-[1000px]">
       {/* Tabs */}
-      <div className="flex items-center gap-1 mb-6 overflow-x-auto pb-2">
+      <div className="flex items-center gap-1 mb-4 overflow-x-auto pb-2">
         {TABS.map((tab) => {
           const Icon = tab.icon;
           return (
@@ -115,7 +115,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Content */}
-      <div className="bg-[#161616] border border-[#222] rounded-xl p-6">
+      <div className="bg-[#161616] border border-[#222] rounded-xl p-4">
         {activeTab === "general" && (
           <div>
             <SectionHeader title="General Settings" description="Basic application preferences" />
