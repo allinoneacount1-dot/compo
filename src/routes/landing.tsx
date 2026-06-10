@@ -6,10 +6,10 @@ import {
   ArrowRight, Terminal, Shield, Zap, Eye, BarChart3, Bell, Trophy,
   ChevronRight, TrendingUp, Activity, AlertTriangle, Users, DollarSign, Target, Wifi,
 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
-import { CountUp } from "@/components/ui/CountUp";
-import { COMPO, ALPHA_SCORE, LIVE_STATS, WHALE_FEEDS, SMART_MONEY_FEEDS } from "@/lib/utils/constants";
+import { Button } from "@/components/ui/Button.tsx";
+import { Badge } from "@/components/ui/Badge.tsx";
+import { CountUp } from "@/components/ui/CountUp.tsx";
+import { COMPO, ALPHA_SCORE, LIVE_STATS, WHALE_FEEDS, SMART_MONEY_FEEDS } from "@/lib/utils/constants.ts";
 
 function navTo(route: string) { window.location.hash = route; }
 
