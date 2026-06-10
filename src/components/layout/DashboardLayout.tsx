@@ -49,8 +49,8 @@ export function DashboardLayout({ children, title = "Overview", isMobileOpen = f
 
       {/* Main content: scrollable, offset by topbar + sidebar */}
       <main
-        className="h-[calc(100dvh-64px)] overflow-y-auto overflow-x-auto md:ml-[260px]"
-        style={{ paddingTop: 0, paddingBottom: 28 }}
+        className="h-[calc(100dvh-64px)] overflow-y-auto overflow-x-auto md:ml-[260px] pt-16"
+        style={{ paddingBottom: 28 }}
       >
         {children}
       </main>
